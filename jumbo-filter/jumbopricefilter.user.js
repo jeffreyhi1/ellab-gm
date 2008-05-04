@@ -17,7 +17,7 @@ var FILTERS = [
   {id:'interface', name:'Interface'  },
   {id:'size',      name:'Size',      sort:sortFloat },
   {id:'vgachip',   name:'Modal'      },
-  {id:'memsize',   name:'Storage',   sort:sortMemory }
+  {id:'capacity',   name:'Capacity',   sort:sortMemory }
 ];
 // init the set
 for (var i=0;i<FILTERS.length;i++) {
@@ -113,13 +113,13 @@ function getAttribute(type, name) {
   }
 
   if (type == 'RAM' || type == 'HDD' || type == 'MAS') {
-    var memsize = name.match(/([\d\.]+[M|G|T]B)/);
-    if (memsize) {
-      memsize = memsize[1];
+    var capacity = name.match(/([\d\.]+[M|G|T]B)/);
+    if (capacity) {
+      capacity = capacity[1];
       // check at least 128MB
-      if ((!memsize.match(/MB$/) || parseInt(memsize, 10) >= 128)) {
+      if ((!capacity.match(/MB$/) || parseInt(capacity, 10) >= 128)) {
         // remove the .0
-        attr.memsize = memsize.replace(/\.0+([^\d])/, '$1');
+        attr.capacity = capacity.replace(/\.0+([^\d])/, '$1');
       }
     }
   }
@@ -156,10 +156,10 @@ function getAttribute(type, name) {
       )));
   }
   if (type == 'MIS') {
-    var memsize = name.match(/([\d]+[M|G|T]B?)/);
-    if (memsize) {
-      attr.memsize = memsize[1];
-      if (!attr.memsize.match(/B$/)) attr.memsize += 'B';
+    var capacity = name.match(/([\d]+[M|G|T]B?)/);
+    if (capacity) {
+      attr.capacity = capacity[1];
+      if (!attr.capacity.match(/B$/)) attr.capacity += 'B';
     }
   }
 
