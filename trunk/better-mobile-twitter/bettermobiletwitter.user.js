@@ -1,11 +1,14 @@
 // ==UserScript==
 // @name           Better Mobile Twitter
-// @version        1.0.0
+// @version        2
 // @namespace      http://ellab.org
 // @author         angusdev
 // @description    To enhance the mobile twitter page
 // @include        http://m.twitter.com/home
 // ==/UserScript==
+
+var enabled = true;
+var isChrome = false;
 
 var loading = false;
 var scrollDetector;
@@ -36,21 +39,23 @@ function nextPage() {
   if (loading) {
     return;
   }
+
   loading = true;
-  scrollDetector.innerHTML = 'Loading older tweets...';
-  GM_xmlhttpRequest({
-    method: 'GET',
-    url: 'http://m.twitter.com/account/home.mobile?page=' + (page + 1),
-    onload: function(fullt) {
-      fullt = fullt.responseText;
+  scrollDetector.innerHTML = 'Loading more tweets...';
+
+  var client = new XMLHttpRequest();
+  client.onreadystatechange = function() {
+    if(this.readyState == 4 && this.status == 200) {
+      var fullt = this.responseText
       var t = extract(fullt, '<ul>', '</ul>');
       document.getElementsByTagName('ul')[0].innerHTML += '<li>Page ' + (page + 1) + '</li>' + t;
       loading = false;
       scrollDetector.innerHTML = '';
       page++;
     }
-  });
-
+  }
+  client.open('GET', 'http://m.twitter.com/account/home.mobile?page=' + (page + 1));
+  client.send(null);
 }
 
 function calcOffsetTop(e) {
@@ -63,7 +68,8 @@ function calcOffsetTop(e) {
 }
 
 function detectScroll() {
-  if (calcOffsetTop(scrollDetector) < document.documentElement.scrollTop + document.documentElement.clientHeight) {
+  var scrollTop = isChrome?document.body.scrollTop:document.documentElement.scrollTop;
+  if (calcOffsetTop(scrollDetector) < scrollTop + document.documentElement.clientHeight) {
     nextPage();
   }
 }
@@ -95,4 +101,9 @@ function functionPrinciple() {
   setInterval(detectScroll, 500);
 }
 
-if (document.body) functionPrinciple();
+if (navigator.userAgent.match(/Chrome/)) {
+  enabled = document.location.href == 'http://m.twitter.com/home';
+  isChrome = true;
+}
+
+if (enabled && document.body) functionPrinciple();
