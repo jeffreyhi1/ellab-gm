@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Google Reader Unread Count
 // @namespace   http://ellab.org/
-// @version     2.0
+// @version     3
 // @description Display actual unread count instead of "1000+" in Google Reader
 // @include     http*://www.google.com/reader/*
 // ==/UserScript==
