@@ -28,7 +28,7 @@ function findItemUnread(countedUrl, item) {
   var countres = item.innerHTML.match(/\((\d*)\+?\)/);
   if (countres) {
     count = parseInt(countres[1], 10);
-    if (item.innerHTML.match(/\(100\+\)/)) {
+    if (item.innerHTML.match(/\(1000\+\)/)) {
       hasplus = true;
     }
     if (countedUrl.indexOf(item.parentNode.parentNode.href) < 0) {
