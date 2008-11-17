@@ -1,22 +1,24 @@
 // ==UserScript==
-// @name        Google Reader Unread Count
-// @namespace   http://ellab.org/
-// @version     4
-// @description Display actual unread count instead of "1000+" in Google Reader
-// @include     http*://www.google.com/reader/*
+// @name            Google Reader Unread Count
+// @version         4
+// @namespace       http://ellab.org/
+// @author          angusdev
+// @description     Display actual unread count instead of "1000+" in Google Reader
+// @include         http*://www.google.com/reader/*
 // ==/UserScript==
 
 /*
 Author: Angus http://angusdev.mysinablog.com/
+              http://angusdev.blogspot.com/
 Date:   2007-09-27
 
 Version history:
-4    12-Nov-2008   Support Chrome
-                   Fix the bug that didn't show the '+' sign in total if a feed has 1000+ unread items
-3    06-Nov-2008   Fix the problem due to Google changed DOM
-                   Fix the problem that didn't count the untagged item
-2    13-Jun-2008   Remove the button, change to refresh every 3 seconds, and will update the window title as well
-1    27-Sep-2007   First release to userscripts.org
+4    12-Nov-2008    Support Chrome
+                    Fix the bug that didn't show the '+' sign in total if a feed has 1000+ unread items
+3    06-Nov-2008    Fix the problem due to Google changed DOM
+                    Fix the problem that didn't count the untagged item
+2    13-Jun-2008    Remove the button, change to refresh every 3 seconds, and will update the window title as well
+1    27-Sep-2007    First release to userscripts.org
 */
 
 var GReaderUnreadCount = {
