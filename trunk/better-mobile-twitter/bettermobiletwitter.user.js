@@ -7,15 +7,24 @@
 // @include        http://m.twitter.com/home
 // ==/UserScript==
 
-var enabled = true;
-var isChrome = false;
+function BetterMobileTwitter() {
+  this.isChrome = false;
+  this.loading = false;
+  this.page = 1;
+}
 
-var loading = false;
-var scrollDetector;
-var page = document.location.href.match(/page=(\d+)/);
-page = parseInt(page?page[1]:1, 10);
+BetterMobileTwitter.prototype.init = function() {
+  var enabled = true;
 
-function extract(s, prefix, suffix) {
+  if (navigator.userAgent.match(/Chrome/)) {
+    enabled = document.location.href == 'http://m.twitter.com/home';
+    this.isChrome = true;
+  }
+
+  if (enabled && document.body) this.functionPrinciple();
+}
+
+BetterMobileTwitter.prototype.extract = function(s, prefix, suffix) {
   var i = s.indexOf(prefix);
   if (i >= 0) {
     s = s.substring(i + prefix.length);
@@ -35,27 +44,28 @@ function extract(s, prefix, suffix) {
   return s;
 }
 
-function nextPage() {
-  if (loading) {
+BetterMobileTwitter.prototype.nextPage = function() {
+  if (this.loading) {
     return;
   }
 
-  loading = true;
-  scrollDetector.innerHTML = 'Loading more tweets...';
+  this.loading = true;
+  document.getElementById('bmt-scrolldetector').innerHTML = 'Loading more tweets...';
 
+  var bmt = this;
   var client = new XMLHttpRequest();
   client.onreadystatechange = function() {
     if (this.readyState == 4) {
       if (this.status == 200) {
-        var fullt = this.responseText
-        var t = extract(fullt, '<ul>', '</ul>');
+        var fullt = this.responseText;
+        var t = bmt.extract(fullt, '<ul>', '</ul>');
         document.getElementsByTagName('ul')[0].innerHTML += '<li>Page ' + (page + 1) + '</li>' + t;
-        loading = false;
-        scrollDetector.innerHTML = '';
+        bmt.loading = false;
+        document.getElementById('bmt-scrolldetector').innerHTML = '';
         page++;
       }
       else {
-        scrollDetector.innerHTML = 'Error ' + this.status;
+        document.getElementById('bmt-scrolldetector').innerHTML = 'Error ' + this.status;
       }
     }
   }
@@ -63,7 +73,7 @@ function nextPage() {
   client.send(null);
 }
 
-function calcOffsetTop(e) {
+BetterMobileTwitter.prototype.calcOffsetTop = function(e) {
   var top = 0;
   do {
     if (!isNaN(e.offsetTop)) top += e.offsetTop;
@@ -72,20 +82,23 @@ function calcOffsetTop(e) {
   return top;
 }
 
-function detectScroll() {
-  var scrollTop = isChrome?document.body.scrollTop:document.documentElement.scrollTop;
-  if (calcOffsetTop(scrollDetector) < scrollTop + document.documentElement.clientHeight) {
-    nextPage();
+BetterMobileTwitter.prototype.detectScroll = function() {
+  var scrollTop = this.isChrome?document.body.scrollTop:document.documentElement.scrollTop;
+  if (this.calcOffsetTop(document.getElementById('bmt-scrolldetector')) < scrollTop + document.documentElement.clientHeight) {
+    this.nextPage();
   }
 }
 
-function statusMessageChanged(e) {
+BetterMobileTwitter.prototype.statusMessageChanged = function(e) {
   document.getElementById('bmt-wordcount').innerHTML = 140 - e.target.value.length;
 }
 
-function functionPrinciple() {
+BetterMobileTwitter.prototype.functionPrinciple = function() {
   // check if it is a mobile version
   if (document.getElementById('dim-screen')) return;
+
+  page = document.location.href.match(/page=(\d+)/);
+  page = page?paresInt(page[1], 10):1;
 
   var status = document.getElementById('status');
   if (status) {
@@ -103,26 +116,22 @@ function functionPrinciple() {
     wordCount.setAttribute('id', 'bmt-wordcount');
     wordCount.innerHTML = '140';
     status.parentNode.appendChild(wordCount);
-    status.addEventListener('keyup', statusMessageChanged, false);
-    status.addEventListener('blur', statusMessageChanged, false);
-    status.addEventListener('focus', statusMessageChanged, false);
+    status.addEventListener('keyup', this.statusMessageChanged, false);
+    status.addEventListener('blur', this.statusMessageChanged, false);
+    status.addEventListener('focus', this.statusMessageChanged, false);
   }
 
   // Change the older link for scroll detector
   var res = document.getElementsByTagName('a');
   for (var i=res.length-1; i>=0; i--) {
     if (res[i].getAttribute('accesskey') == 6) {
-      scrollDetector = res[i].parentNode;
+      var scrollDetector = res[i].parentNode;
+      scrollDetector.setAttribute('id', 'bmt-scrolldetector');
       scrollDetector.innerHTML = '';
     }
   }
 
-  setInterval(detectScroll, 500);
+  var bmt = this;
+  window.setInterval(function() {bmt.detectScroll(bmt);}, 500);
 }
-
-if (navigator.userAgent.match(/Chrome/)) {
-  enabled = document.location.href == 'http://m.twitter.com/home';
-  isChrome = true;
-}
-
-if (enabled && document.body) functionPrinciple();
+new BetterMobileTwitter().init();
