@@ -45,13 +45,18 @@ function nextPage() {
 
   var client = new XMLHttpRequest();
   client.onreadystatechange = function() {
-    if(this.readyState == 4 && this.status == 200) {
-      var fullt = this.responseText
-      var t = extract(fullt, '<ul>', '</ul>');
-      document.getElementsByTagName('ul')[0].innerHTML += '<li>Page ' + (page + 1) + '</li>' + t;
-      loading = false;
-      scrollDetector.innerHTML = '';
-      page++;
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        var fullt = this.responseText
+        var t = extract(fullt, '<ul>', '</ul>');
+        document.getElementsByTagName('ul')[0].innerHTML += '<li>Page ' + (page + 1) + '</li>' + t;
+        loading = false;
+        scrollDetector.innerHTML = '';
+        page++;
+      }
+      else {
+        scrollDetector.innerHTML = 'Error ' + this.status;
+      }
     }
   }
   client.open('GET', 'http://m.twitter.com/account/home.mobile?page=' + (page + 1));
