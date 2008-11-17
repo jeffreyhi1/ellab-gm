@@ -132,7 +132,6 @@ BetterMobileTwitter.prototype.checkUpdate = function() {
 
           t = bmt.extract(t, '</li>');
         }
-        newTweetsCount = 2;
         document.getElementById('bmt-checkupdate').innerHTML = newTweetsCount?(newTweetsCount + ' new tweet' + (newTweetsCount>1?'s':'')):'';
       }
       else if (this.status) {
