@@ -96,6 +96,7 @@ function functionPrinciple() {
       br.parentNode.removeChild(br);
       status.style.marginRight = '7px';
     }
+    status.style.width = '500px';
 
     // show remaining char
     var wordCount = document.createElement('span');
