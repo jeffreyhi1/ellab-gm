@@ -11,6 +11,7 @@ function BetterMobileTwitter() {
   this.isChrome = false;
   this.loading = false;
   this.page = 1;
+  this.lastMessage = '';
 }
 
 BetterMobileTwitter.prototype.init = function() {
@@ -93,6 +94,43 @@ BetterMobileTwitter.prototype.statusMessageChanged = function(e) {
   document.getElementById('bmt-wordcount').innerHTML = 140 - e.target.value.length;
 }
 
+BetterMobileTwitter.prototype.checkUpdate = function() {
+  var bmt = this;
+  var client = new XMLHttpRequest();
+  client.onreadystatechange = function() {
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        var newTweetsCount = 0;
+        var fullt = this.responseText;
+        var t = bmt.extract(fullt, '<ul>', '</ul>');
+        while (t) {
+          var li = bmt.extract(t, '<li>', '</li>');
+          li = li?li.replace(/<small>[^<]*<\/small>/, ''):'';
+          if (li) {
+            if (li == bmt.lastMessage) {
+              break;
+            }
+            else {
+              newTweetsCount++;
+            }
+          }
+
+          t = bmt.extract(t, '</li>');
+        }
+        newTweetsCount = 2;
+        document.getElementById('bmt-checkupdate').innerHTML = newTweetsCount?(newTweetsCount + ' new tweet' + (newTweetsCount>1?'s':'')):'';
+      }
+      else if (this.status) {
+        document.getElementById('bmt-checkupdate').innerHTML = 'Error ' + this.status;
+      }
+
+      window.setTimeout(function() {bmt.checkUpdate(bmt);}, 3000);
+    }
+  }
+  client.open('GET', 'http://m.twitter.com/account/home.mobile');
+  client.send(null);
+}
+
 BetterMobileTwitter.prototype.functionPrinciple = function() {
   // check if it is a mobile version
   if (document.getElementById('dim-screen')) return;
@@ -131,7 +169,19 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
     }
   }
 
+  // get last message
+  var lastMessageLi = document.getElementsByTagName('li');
+  if (lastMessageLi.length) {
+    this.lastMessage = lastMessageLi[0].innerHTML.replace(/ xmlns="[^"]*"/g, '');
+    this.lastMessage = this.lastMessage.replace(/<small>[^<]*<\/small>/, '');
+  }
+  var checkUpdateSpan = document.createElement('span');
+  checkUpdateSpan.setAttribute('id', 'bmt-checkupdate');
+  checkUpdateSpan.setAttribute('style', 'position: absolute; right: 3px; top: 3px;');
+  document.getElementsByTagName('div')[0].appendChild(checkUpdateSpan);
+
   var bmt = this;
   window.setInterval(function() {bmt.detectScroll(bmt);}, 500);
+  window.setTimeout(function() {bmt.checkUpdate(bmt);}, 60000);
 }
 new BetterMobileTwitter().init();
