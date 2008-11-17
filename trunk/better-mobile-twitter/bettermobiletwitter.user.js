@@ -1,11 +1,26 @@
 // ==UserScript==
-// @name           Better Mobile Twitter
-// @version        2
-// @namespace      http://ellab.org
-// @author         angusdev
-// @description    To enhance the mobile twitter page
-// @include        http://m.twitter.com/home
+// @name            Better Mobile Twitter
+// @version         3
+// @namespace       http://ellab.org
+// @author          angusdev
+// @description     To enhance the mobile twitter page
+// @include         http://m.twitter.com/home
 // ==/UserScript==
+
+/*
+Author: Angus http://angusdev.mysinablog.com/
+              http://angusdev.blogspot.com/
+Date:   2008-10-13
+
+Version history:
+3    17-Nov-2008    Add the character count function
+                    Check for new tweets on background
+                    Make the input box wider
+                    Show error message if AJAX call fails
+                    Change to a OO approach
+2    06-Nov-2008    Support Chrome
+1    13-Oct-2008    First release to userscripts.org
+*/
 
 function BetterMobileTwitter() {
   this.isChrome = false;
