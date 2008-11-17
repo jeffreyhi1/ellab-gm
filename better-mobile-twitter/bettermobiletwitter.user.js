@@ -74,19 +74,32 @@ function detectScroll() {
   }
 }
 
+function statusMessageChanged(e) {
+  document.getElementById('bmt-wordcount').innerHTML = 140 - e.target.value.length;
+}
+
 function functionPrinciple() {
   // check if it is a mobile version
   if (document.getElementById('dim-screen')) return;
 
-  // remove the BR between status editbox and update button
   var status = document.getElementById('status');
   if (status) {
+    // remove the BR between status editbox and update button
     var br = status.nextSibling;
     while (br && br.tagName != 'br') br = br.nextSibling;
     if (br && br.parentNode) {
       br.parentNode.removeChild(br);
       status.style.marginRight = '7px';
     }
+
+    // show remaining char
+    var wordCount = document.createElement('span');
+    wordCount.setAttribute('id', 'bmt-wordcount');
+    wordCount.innerHTML = '140';
+    status.parentNode.appendChild(wordCount);
+    status.addEventListener('keyup', statusMessageChanged, false);
+    status.addEventListener('blur', statusMessageChanged, false);
+    status.addEventListener('focus', statusMessageChanged, false);
   }
 
   // Change the older link for scroll detector
