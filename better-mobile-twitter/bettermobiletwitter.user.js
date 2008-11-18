@@ -13,7 +13,7 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2008-10-13
 
 Version history:
-3    17-Nov-2008    Add the character count function
+3    18-Nov-2008    Add the character count function
                     Check for new tweets on background
                     Make the input box wider
                     Show error message if AJAX call fails
@@ -122,6 +122,8 @@ BetterMobileTwitter.prototype.checkUpdate = function() {
           var li = bmt.extract(t, '<li>', '</li>');
           li = li?li.replace(/<small>[^<]*<\/small>/, ''):'';
           if (li) {
+            document.getElementById('bmt-htmlholder').innerHTML = li;
+            li = document.getElementById('bmt-htmlholder').innerHTML;
             if (li == bmt.lastMessage) {
               break;
             }
@@ -138,7 +140,7 @@ BetterMobileTwitter.prototype.checkUpdate = function() {
         document.getElementById('bmt-checkupdate').innerHTML = 'Error ' + this.status;
       }
 
-      window.setTimeout(function() {bmt.checkUpdate(bmt);}, 3000);
+      window.setTimeout(function() {bmt.checkUpdate(bmt);}, 60000);
     }
   }
   client.open('GET', 'http://m.twitter.com/account/home.mobile');
@@ -186,13 +188,19 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   // get last message
   var lastMessageLi = document.getElementsByTagName('li');
   if (lastMessageLi.length) {
-    this.lastMessage = lastMessageLi[0].innerHTML.replace(/ xmlns="[^"]*"/g, '');
-    this.lastMessage = this.lastMessage.replace(/<small>[^<]*<\/small>/, '');
+    this.lastMessage = lastMessageLi[0].innerHTML;
+    this.lastMessage = this.lastMessage.replace(/<small[^<]*<\/small>/, '');
   }
   var checkUpdateSpan = document.createElement('span');
   checkUpdateSpan.setAttribute('id', 'bmt-checkupdate');
   checkUpdateSpan.setAttribute('style', 'position: absolute; right: 3px; top: 3px;');
   document.getElementsByTagName('div')[0].appendChild(checkUpdateSpan);
+
+  // an element to convert text to HTML, for comparing last message
+  var htmlholder = document.createElement('span');
+  htmlholder.setAttribute('id', 'bmt-htmlholder');
+  htmlholder.style.display = 'none';
+  document.body.appendChild(htmlholder);
 
   var bmt = this;
   window.setInterval(function() {bmt.detectScroll(bmt);}, 500);
