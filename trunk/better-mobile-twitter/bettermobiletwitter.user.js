@@ -34,14 +34,12 @@ function BetterMobileTwitter() {
 }
 
 BetterMobileTwitter.prototype.init = function() {
-  var enabled = true;
-
   if (navigator.userAgent.match(/Chrome/)) {
-    enabled = document.location.href == 'http://m.twitter.com/home';
+    this.enabled = document.location.href == 'http://m.twitter.com/home';
     this.isChrome = true;
   }
 
-  if (enabled && document.body) this.functionPrinciple();
+  if (this.enabled && document.body) this.functionPrinciple();
 }
 
 BetterMobileTwitter.prototype.extract = function(s, prefix, suffix) {
