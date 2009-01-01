@@ -48,12 +48,13 @@ function BetterMobileTwitter() {
     {name:'snipurl',  func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/snipurl\.com\//},
     {name:'pingfm',   func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/ping\.fm\//},
     {name:'ffim',     func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/ff\.im\//},
-    {name:'hellotxt', func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/hellotxt\.com\//},
+    {name:'hellotxt', func:this.expandUrl_hellotxt, ajax:true,  regex:/http:\/\/hellotxt\.com\//},
     //{name:'funp',     func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/funp\.com\//},
     {name:'twitpic',  func:this.expandUrl_twitpic, ajax:true,  regex:/http:\/\/twitpic\.com\//},
     {name:'twinkle',  func:this.expandUrl_twinkle, ajax:true,  regex:/http:\/\/twinkle\.tapulous\.com\/index\.php\?hash=/},
     {name:'flickr',   func:this.expandUrl_flickr,  ajax:true,  regex:/(www\.)?flickr\.com\/photos/},
-    {name:'youtube',  func:this.expandUrl_youtube, ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//}
+    {name:'youtube',  func:this.expandUrl_youtube, ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
+    {name:'img',      func:this.expandUrl_img,     ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)/}
   ];
 }
 
@@ -121,7 +122,7 @@ BetterMobileTwitter.prototype.nextPage = function() {
         bmt.loading = false;
         document.getElementById('bmt-scrolldetector').innerHTML = '';
         bmt.page++;
-        bmt.expandUrl(3);
+        bmt.expandUrl(1);
       }
       else {
         document.getElementById('bmt-scrolldetector').innerHTML = 'Error ' + this.status;
@@ -216,6 +217,15 @@ BetterMobileTwitter.prototype.expandUrl_image = function(a, url, imgsrc) {
   this.expandUrl(1);
 }
 
+BetterMobileTwitter.prototype.expandUrl_hellotxt = function(bmt, a, url, t) {
+  t = bmt.extract(bmt.extract(t.responseText, '<div class="history-row big">'), '<p>', '</p>');
+  if (t) {
+    a.innerHTML = t;
+  }
+
+  bmt.expandUrl(1);
+}
+
 BetterMobileTwitter.prototype.expandUrl_twitpic = function(bmt, a, url, t) {
   t = bmt.extract(bmt.extract(t.responseText, '<img id="pic"'), 'src="', '"');
   bmt.expandUrl_image(a, url, t);
@@ -244,6 +254,12 @@ BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
 
     bmt.expandUrl_image(a, url, 'http://i4.ytimg.com/vi/' + res[1] + '/default.jpg');
   }
+}
+
+BetterMobileTwitter.prototype.expandUrl_img = function(bmt, a, url) {
+  bmt.expandUrl_image(a, url, url);
+
+  bmt.expandUrl(1);
 }
 
 BetterMobileTwitter.prototype.expandOneUrl_ajaxWrapper = function(bmt, a, url, func) {
