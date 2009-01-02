@@ -113,8 +113,9 @@ BetterMobileTwitter.prototype.nextPage = function() {
         var t = bmt.extract(fullt, '<ul>', '</ul>');
         // Some tweets has special character, need to remove it
         for (var i=0;i<t.length;i++) {
-          if (t.charCodeAt(i) < 10) {
+          if (t.charCodeAt(i) < 32 && t.charCodeAt(i) != 10 && t.charCodeAt(i) != 13 && t.charCodeAt(i) != 9) {
             t = t.substring(0, i) + t.substring(i+1);
+            --i;
           }
         }
 
