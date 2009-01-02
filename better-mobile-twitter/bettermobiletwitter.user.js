@@ -122,6 +122,19 @@ BetterMobileTwitter.prototype.nextPage = function() {
         document.getElementsByTagName('ul')[0].innerHTML += '<li>Page ' + (bmt.page + 1) + '</li>' + t;
         bmt.loading = false;
         document.getElementById('bmt-scrolldetector').innerHTML = '';
+
+        // add user filter
+        var filter = document.getElementById('bmt-userfilter');
+        while (t) {
+          var li = bmt.extract(t, '<li>', '</li>');
+          if (li) {
+            bmt.addUserFilter(filter, li);
+          }
+
+          t = bmt.extract(t, '</li>');
+        }
+        bmt.onUserFilterChanged(filter);
+
         bmt.page++;
         bmt.expandUrl(1);
       }
@@ -196,6 +209,37 @@ BetterMobileTwitter.prototype.checkUpdate = function() {
   }
   client.open('GET', 'http://m.twitter.com/account/home.mobile');
   client.send(null);
+}
+
+BetterMobileTwitter.prototype.addUserFilter = function(filter, li) {
+  // get user list
+  var nameres = li.match(/^<a[^>]*>([^<]*)</);
+  if (nameres) {
+    var name = nameres[1];
+    for (var i=1; i<filter.options.length; i++) {
+      if (filter.options[i].value.toLowerCase() == name.toLowerCase()) return;
+      if (filter.options[i].value.toLowerCase() > name.toLowerCase()) break;
+    }
+
+    var option = document.createElement('option');
+    option.text = name;
+    option.value = name;
+    filter.options.add(option, i);
+  }
+}
+
+BetterMobileTwitter.prototype.onUserFilterChanged = function(filter) {
+  var name = filter.options[filter.selectedIndex].value;
+
+  var lis = document.getElementsByTagName('li');
+  for (var i=0; i<lis.length; i++) {
+    if (filter.selectedIndex == 0 || lis[i].innerHTML.match('href="\/' + name + '"')) {
+      lis[i].style.display = '';
+    }
+    else {
+      lis[i].style.display = 'none';
+    }
+  }
 }
 
 BetterMobileTwitter.prototype.expandUrl_tinyurl = function(bmt, a, url, t) {
@@ -350,6 +394,25 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
     status.addEventListener('keyup', this.statusMessageChanged, false);
     status.addEventListener('blur', this.statusMessageChanged, false);
     status.addEventListener('focus', this.statusMessageChanged, false);
+
+    // dropdown for user filter
+    var filter = document.createElement('select');
+    filter.setAttribute('id', 'bmt-userfilter');
+    filter.setAttribute('style', 'margin-left: 30px;');
+    filter.addEventListener('change', function(e) { bmt.onUserFilterChanged(e.target)}, false);
+
+    var option = document.createElement('option');
+    option.text = ' --- Filter --- ';
+    option.value = ' ';
+    filter.options.add(option, 0);
+
+    // generate user filter list
+    var lis = document.getElementsByTagName('li');
+    for (var i=0;i<lis.length;i++) {
+      this.addUserFilter(filter, lis[i].innerHTML);
+    }
+
+    status.parentNode.appendChild(filter);
   }
 
   // Change the older link for scroll detector
