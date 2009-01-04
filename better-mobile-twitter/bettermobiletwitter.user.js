@@ -198,7 +198,15 @@ BetterMobileTwitter.prototype.checkUpdate = function() {
 
           t = bmt.extract(t, '</li>');
         }
-        document.getElementById('bmt-checkupdate').innerHTML = newTweetsCount?(newTweetsCount + ' new tweet' + (newTweetsCount>1?'s':'')):'';
+        if (newTweetsCount) {
+          document.getElementById('bmt-checkupdate').innerHTML = newTweetsCount + ' new tweet' + (newTweetsCount>1?'s':'');
+          if (document.title.match(/^\(\d+\)/)) {
+            document.title = document.title.replace(/^\(\d+\)/, '(' + newTweetsCount + ')')
+          }
+          else {
+            document.title = '(' + newTweetsCount + ') ' + document.title;
+          }
+        }
       }
       else if (this.status) {
         document.getElementById('bmt-checkupdate').innerHTML = 'Error ' + this.status;
