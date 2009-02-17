@@ -119,7 +119,13 @@ BetterMobileTwitter.prototype.nextPage = function() {
           }
         }
 
-        document.getElementsByTagName('ul')[0].innerHTML += '<li>Page ' + (bmt.page + 1) + '</li>' + t;
+        var ulholder = document.createElement('ul');
+        ulholder.innerHTML = '<li>Page ' + (bmt.page + 1) + '</li>' + t;
+        var targetul = document.getElementsByTagName('ul')[0];
+        for (var i=0;i<ulholder.childNodes.length;i++) {
+          targetul.appendChild(ulholder.childNodes[i]);
+        }
+
         bmt.loading = false;
         document.getElementById('bmt-scrolldetector').innerHTML = '';
 
@@ -251,7 +257,9 @@ BetterMobileTwitter.prototype.onUserFilterChanged = function(filter) {
 }
 
 BetterMobileTwitter.prototype.expandUrl_tinyurl = function(bmt, a, url, t) {
-  a.innerHTML = bmt.encodeHTML(decodeURIComponent(t.finalUrl));
+  if (url != t.finalUrl) {
+    a.innerHTML = bmt.encodeHTML(decodeURIComponent(t.finalUrl));
+  }
   a.setAttribute('bmt-finalurl', t.finalUrl);
   if (!bmt.expandOneUrl(a)) {
     bmt.expandUrl(1);
