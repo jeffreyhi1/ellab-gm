@@ -281,6 +281,7 @@ BetterMobileTwitter.prototype.expandUrl_image = function(a, url, imgsrc) {
 BetterMobileTwitter.prototype.expandUrl_hellotxt = function(bmt, a, url, t) {
   if (url != t.finalUrl) {
     bmt.expandUrl_tinyurl(bmt, a, url, t);
+    return;
   }
 
   t = bmt.extract(bmt.extract(t.responseText, '<div class="history-row big">'), '<p>', '</p>');
