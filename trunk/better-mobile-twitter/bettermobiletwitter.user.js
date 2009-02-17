@@ -44,17 +44,17 @@ function BetterMobileTwitter() {
     }
   };
   this.expandUrlMap = [
-    {name:'tinyurl',  func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/tinyurl\.com\//},
-    {name:'snipurl',  func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/snipurl\.com\//},
-    {name:'pingfm',   func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/ping\.fm\//},
-    {name:'ffim',     func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/ff\.im\//},
+    {name:'tinyurl',  func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/tinyurl\.com\//},
+    {name:'snipurl',  func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/snipurl\.com\//},
+    {name:'pingfm',   func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/ping\.fm\//},
+    {name:'ffim',     func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/ff\.im\//},
     {name:'hellotxt', func:this.expandUrl_hellotxt, ajax:true,  regex:/http:\/\/hellotxt\.com\//},
     //{name:'funp',     func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/funp\.com\//},
-    {name:'twitpic',  func:this.expandUrl_twitpic, ajax:true,  regex:/http:\/\/twitpic\.com\//},
-    {name:'twinkle',  func:this.expandUrl_twinkle, ajax:true,  regex:/http:\/\/twinkle\.tapulous\.com\/index\.php\?hash=/},
-    {name:'flickr',   func:this.expandUrl_flickr,  ajax:true,  regex:/(www\.)?flickr\.com\/photos/},
-    {name:'youtube',  func:this.expandUrl_youtube, ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
-    {name:'img',      func:this.expandUrl_img,     ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)/}
+    {name:'twitpic',  func:this.expandUrl_twitpic,  ajax:true,  regex:/http:\/\/twitpic\.com\//},
+    {name:'tapulous', func:this.expandUrl_tapulous, ajax:true,  regex:/http:\/\/twinkle\.tapulous\.com\/index\.php\?hash=/},
+    {name:'flickr',   func:this.expandUrl_flickr,   ajax:true,  regex:/(www\.)?flickr\.com\/photos/},
+    {name:'youtube',  func:this.expandUrl_youtube,  ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
+    {name:'img',      func:this.expandUrl_img,      ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)/}
   ];
 }
 
@@ -297,8 +297,14 @@ BetterMobileTwitter.prototype.expandUrl_twitpic = function(bmt, a, url, t) {
   bmt.expandUrl_image(a, url, t);
 }
 
-BetterMobileTwitter.prototype.expandUrl_twinkle = function(bmt, a, url, t) {
-  t = bmt.extract(bmt.extract(t.responseText, '<div id="post">'), 'img src="', '"');
+BetterMobileTwitter.prototype.expandUrl_tapulous = function(bmt, a, url, t) {
+  var res = url.match(/[\?|&]hash=([a-zA-Z0-9]*)(&.*$)?/);
+  if (res) {
+    // show the first 4 hash, then follow by ...
+    a.innerHTML = a.innerHTML.replace(/([\?|&amp;]hash=[a-zA-Z0-9]{4})[a-zA-Z0-9]*/, '$1...');
+  }
+
+  t = bmt.extract(bmt.extract(bmt.extract(t.responseText, '<div id="post">'), '</div>'), 'img src="', '"');
   bmt.expandUrl_image(a, url, t);
 }
 
@@ -316,7 +322,7 @@ BetterMobileTwitter.prototype.expandUrl_flickr = function(bmt, a, url, t) {
 BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
   var res = url.match(/[\?|&]v=([a-zA-Z0-9]*)(&.*$)?/);
   if (res) {
-    a.innerHTML = a.innerHTML.replace(/([\?|&]v=[a-zA-Z0-9]*)(&amp;.*$)/, '$1&amp;...');
+    a.innerHTML = a.innerHTML.replace(/([\?|&]v=[a-zA-Z0-9]*)(&.*$)/, '$1&amp;...');
 
     bmt.expandUrl_image(a, url, 'http://i4.ytimg.com/vi/' + res[1] + '/default.jpg');
   }
