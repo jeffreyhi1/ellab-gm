@@ -44,18 +44,19 @@ function BetterMobileTwitter() {
     }
   };
   this.expandUrlMap = [
-    {name:'tinyurl',  func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/tinyurl\.com\//},
-    {name:'snipurl',  func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/snipurl\.com\//},
-    {name:'pingfm',   func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/ping\.fm\//},
-    {name:'ffim',     func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/ff\.im\//},
-    {name:'isgd',     func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/is\.gd\//},
-    {name:'hellotxt', func:this.expandUrl_hellotxt, ajax:true,  regex:/http:\/\/hellotxt\.com\//},
+    {name:'tinyurl',  func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/tinyurl\.com\/[a-zA-z0-9]+$/},
+    {name:'snipurl',  func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/snipurl\.com\/[a-zA-z0-9]+$/},
+    {name:'pingfm',   func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/ping\.fm\/[a-zA-z0-9]+$/},
+    {name:'ffim',     func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/ff\.im\/[a-zA-z0-9]+$/},
+    {name:'isgd',     func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/is\.gd\/[a-zA-z0-9]+$/},
+    {name:'bitly',    func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/bit\.ly\/[a-zA-z0-9]+$/},
+    {name:'hellotxt', func:this.expandUrl_hellotxt, ajax:true,  regex:/http:\/\/hellotxt\.com\/[a-zA-z0-9]+$/},
     //{name:'funp',     func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/funp\.com\//},
-    {name:'twitpic',  func:this.expandUrl_twitpic,  ajax:true,  regex:/http:\/\/twitpic\.com\//},
+    {name:'twitpic',  func:this.expandUrl_twitpic,  ajax:true,  regex:/http:\/\/twitpic\.com\/[a-zA-z0-9]+$/},
     {name:'tapulous', func:this.expandUrl_tapulous, ajax:true,  regex:/http:\/\/twinkle\.tapulous\.com\/index\.php\?hash=/},
     {name:'flickr',   func:this.expandUrl_flickr,   ajax:true,  regex:/(www\.)?flickr\.com\/photos/},
     {name:'youtube',  func:this.expandUrl_youtube,  ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
-    {name:'img',      func:this.expandUrl_img,      ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)/}
+    {name:'img',      func:this.expandUrl_img,      ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/}
   ];
 }
 
