@@ -407,7 +407,6 @@ BetterMobileTwitter.prototype.expandOneUrl = function(a) {
   }
   for (var j=0;j<this.expandUrlMap.length;j++) {
     if (url.match(this.expandUrlMap[j].regex)) {
-      //unsafeWindow.console.log('hit ' + a.href);
       if (this.expandUrlMap[j].ajax) {
         this.expandOneUrl_ajaxWrapper(this, a, url, this.expandUrlMap[j].func);
       }
@@ -423,11 +422,9 @@ BetterMobileTwitter.prototype.expandOneUrl = function(a) {
 }
 
 BetterMobileTwitter.prototype.expandUrl = function(maxRun) {
-  //unsafeWindow.console.log('enter loop');
   if (!GM_xmlhttpRequest) return;
 
   var res = document.evaluate("//html:a[not(@bmt-expandurl)]", document, this.nsResolver, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-  //unsafeWindow.console.log(res.snapshotLength);
   var loadcount = 0;
   for (var i=0;i<res.snapshotLength;i++) {
     var a = res.snapshotItem(i);
@@ -435,7 +432,6 @@ BetterMobileTwitter.prototype.expandUrl = function(maxRun) {
       if (++loadcount >= maxRun) return;
     }
   }
-  //unsafeWindow.console.log('exit loop');
 }
 
 BetterMobileTwitter.prototype.functionPrinciple = function() {
