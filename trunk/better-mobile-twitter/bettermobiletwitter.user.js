@@ -400,7 +400,6 @@ BetterMobileTwitter.prototype.expandOneUrl_ajaxWrapper = function(bmt, a, url, f
 }
 
 BetterMobileTwitter.prototype.expandOneUrl = function(a) {
-  a.setAttribute('bmt-expandurl', 'true');
   var url = a.getAttribute('bmt-finalurl');
   if (!url || url == '') {
     url = a.href;
@@ -428,8 +427,11 @@ BetterMobileTwitter.prototype.expandUrl = function(maxRun) {
   var loadcount = 0;
   for (var i=0;i<res.snapshotLength;i++) {
     var a = res.snapshotItem(i);
-    if (this.expandOneUrl(a)) {
-      if (++loadcount >= maxRun) return;
+    if (!a.getAttribute('bmt-expandurl')) {
+      a.setAttribute('bmt-expandurl', 'true');
+      if (this.expandOneUrl(a)) {
+        if (++loadcount >= maxRun) return;
+      }
     }
   }
 }
