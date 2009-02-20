@@ -421,7 +421,7 @@ BetterMobileTwitter.prototype.expandOneUrl = function(a) {
 }
 
 BetterMobileTwitter.prototype.expandUrl = function(maxRun) {
-  if (!GM_xmlhttpRequest) return;
+  if (this.isChrome) return;
 
   var res = document.evaluate("//html:a[not(@bmt-expandurl)]", document, this.nsResolver, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
   var loadcount = 0;
