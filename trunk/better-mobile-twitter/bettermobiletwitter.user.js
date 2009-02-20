@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Better Mobile Twitter
-// @version         3
+// @version         4
 // @namespace       http://ellab.org
 // @author          angusdev
 // @description     To enhance the mobile twitter page
@@ -10,9 +10,14 @@
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2008-10-13
+Date:   2009-02-20
 
 Version history:
+4    20-Feb-2009    Auto expand short URL
+                    Image and Youtube preview
+                    Filter by user
+                    Show new tweets count in window title
+                    Fine tune the checking of invalid char
 3    18-Nov-2008    Add the character count function
                     Check for new tweets on background
                     Add an on-off button
