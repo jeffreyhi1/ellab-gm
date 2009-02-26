@@ -103,6 +103,19 @@ BetterMobileTwitter.prototype.extract = function(s, prefix, suffix) {
   return s;
 }
 
+BetterMobileTwitter.prototype.extractTweetsHTML = function(fullt) {
+  var t = this.extract(fullt, '<ul>', '</ul>');
+  // Some tweets has special character, need to remove it
+  for (var i=0;i<t.length;i++) {
+    if (t.charCodeAt(i) < 32 && t.charCodeAt(i) != 10 && t.charCodeAt(i) != 13 && t.charCodeAt(i) != 9) {
+      t = t.substring(0, i) + t.substring(i+1);
+      --i;
+    }
+  }
+
+  return t;
+}
+
 BetterMobileTwitter.prototype.nextPage = function() {
   if (this.loading) {
     return;
@@ -116,19 +129,11 @@ BetterMobileTwitter.prototype.nextPage = function() {
   client.onreadystatechange = function() {
     if (this.readyState == 4) {
       if (this.status == 200) {
-        var fullt = this.responseText;
-        var t = bmt.extract(fullt, '<ul>', '</ul>');
-        // Some tweets has special character, need to remove it
-        for (var i=0;i<t.length;i++) {
-          if (t.charCodeAt(i) < 32 && t.charCodeAt(i) != 10 && t.charCodeAt(i) != 13 && t.charCodeAt(i) != 9) {
-            t = t.substring(0, i) + t.substring(i+1);
-            --i;
-          }
-        }
+        var t = bmt.extractTweetsHTML(this.responseText);
 
         var ulholder = document.createElement('ul');
         ulholder.innerHTML = '<li>Page ' + (bmt.page + 1) + '</li>' + t;
-        var targetul = document.getElementsByTagName('ul')[0];
+        var targetul = document.getElementById('bmt-tweetsdiv').getElementsByTagName('ul')[0];
         for (var i=0;i<ulholder.childNodes.length;i++) {
           targetul.appendChild(ulholder.childNodes[i]);
         }
@@ -157,6 +162,26 @@ BetterMobileTwitter.prototype.nextPage = function() {
     }
   }
   client.open('GET', 'http://m.twitter.com/account/home.mobile?page=' + (bmt.page + 1));
+  client.send(null);
+}
+
+BetterMobileTwitter.prototype.loadReplies = function() {
+  document.getElementById('bmt-replydiv').innerHTML = 'Loading replies...';
+
+  var bmt = this;
+  var client = new XMLHttpRequest();
+  client.onreadystatechange = function() {
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        var t = bmt.extractTweetsHTML(this.responseText);
+        document.getElementById('bmt-replydiv').innerHTML = '<div class="s" style="font-size:133%;"><b>replies</b></div><ul>' + t + '</ul>';
+      }
+      else {
+        document.getElementById('bmt-replydiv').innerHTML = 'Error ' + this.status;
+      }
+    }
+  }
+  client.open('GET', 'http://m.twitter.com/replies');
   client.send(null);
 }
 
@@ -428,7 +453,7 @@ BetterMobileTwitter.prototype.expandOneUrl = function(a) {
 BetterMobileTwitter.prototype.expandUrl = function(maxRun) {
   if (this.isChrome) return;
 
-  var res = document.evaluate("//html:a[not(@bmt-expandurl)]", document, this.nsResolver, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  var res = document.evaluate("//html:div[@id='bmt-tweetsdiv']//html:a[not(@bmt-expandurl)]", document, this.nsResolver, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
   var loadcount = 0;
   for (var i=0;i<res.snapshotLength;i++) {
     var a = res.snapshotItem(i);
@@ -450,6 +475,23 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   this.page = document.location.href.match(/page=(\d+)/);
   this.page = this.page?paresInt(this.page[1], 10):1;
 
+  // add replies layer
+  var replyDiv = document.createElement('div');
+  var tweetsDiv = document.createElement('div');
+  var tweetsUl = document.getElementsByTagName('ul')[0];
+
+  tweetsDiv.setAttribute('style', 'width:80%;');
+  tweetsDiv.setAttribute('id', 'bmt-tweetsdiv');
+  replyDiv.setAttribute('style', 'float:right; width:19%; min-height: 100px; margin-left:1%; margin-right:3px; padding:5px; font-size: 75%; ' +
+                                 'background:#f9ffe8;ecffbb; border:1px solid #87bc44; -moz-border-radius:5px;');
+  replyDiv.setAttribute('id', 'bmt-replydiv');
+
+  tweetsUl.parentNode.insertBefore(replyDiv, tweetsUl);
+  tweetsUl.parentNode.insertBefore(tweetsDiv, tweetsUl);
+  tweetsDiv.appendChild(tweetsUl);
+  this.loadReplies();
+
+  // modify status window
   var status = document.getElementById('status');
   if (status) {
     // remove the BR between status editbox and update button
@@ -511,6 +553,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   checkUpdateSpan.setAttribute('style', 'position: absolute; right: 100px; top: 3px;');
   document.getElementsByTagName('div')[0].appendChild(checkUpdateSpan);
 
+  // on off button
   var onoff = document.createElement('img');
   onoff.src = bmt.onsrc;
   onoff.setAttribute('style', 'position: absolute; right: 0px; top: 0px; cursor:pointer;');
