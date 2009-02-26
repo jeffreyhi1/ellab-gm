@@ -132,11 +132,17 @@ BetterMobileTwitter.prototype.nextPage = function() {
       if (this.status == 200) {
         var t = bmt.extractTweetsHTML(this.responseText);
 
-        var ulholder = document.createElement('ul');
-        ulholder.innerHTML = '<li>Page ' + (bmt.page + 1) + '</li>' + t;
         var targetul = document.getElementById('bmt-tweetsdiv').getElementsByTagName('ul')[0];
-        for (var i=0;i<ulholder.childNodes.length;i++) {
-          targetul.appendChild(ulholder.childNodes[i]);
+        pageli = document.createElement('li');
+        pageli.innerHTML = 'Page ' + (bmt.page + 1);
+        targetul.appendChild(pageli);
+        var ulholder = document.createElement('ul');
+        ulholder.innerHTML = t;
+        var lilist = ulholder.getElementsByTagName('li');
+        while (lilist.length) {
+          lilist[0].addEventListener('mouseover', function(e) { bmt.onMouseOverOutTweets(e.target, true); }, false);
+          lilist[0].addEventListener('mouseout', function(e) { bmt.onMouseOverOutTweets(e.target, false); }, false);
+          targetul.appendChild(lilist[0]);
         }
 
         bmt.loading = false;
@@ -467,6 +473,50 @@ BetterMobileTwitter.prototype.expandUrl = function(maxRun) {
   }
 }
 
+BetterMobileTwitter.prototype.onMouseOverOutTweets = function(obj, isover) {
+  while (obj && obj.tagName.toUpperCase() != 'LI') {
+    obj = obj.parentNode;
+  }
+  if (obj) {
+    var actionspan = obj.getElementsByTagName('span');
+    if (actionspan.length > 0 && actionspan[actionspan.length - 1].getAttribute('bmt-actionspan')) {
+      actionspan = actionspan[actionspan.length - 1];
+    }
+    else if (isover) {
+      actionspan = document.createElement('span');
+      actionspan.setAttribute('bmt-actionspan', 'true');
+      // tweets div is 80% width, so use right: 22%
+      actionspan.setAttribute('style', 'position: absolute; right: 22%; cursor:pointer; padding:3px;');
+
+      var replybtn = document.createElement('img');
+      replybtn.src = 'http://static.twitter.com/images/icon_reply.gif';
+      replybtn.addEventListener('click', function(e) {
+        var status = document.getElementById('status');
+        if (status) {
+          var replyto = '@' + obj.getElementsByTagName('a')[0].textContent;
+          // ignore if already start with the replyto string
+          if (!status.value.match('^' + replyto)) {
+            status.value = replyto + ' ' + status.value.replace(replyto, '');
+          }
+        }
+      }, false);
+
+      actionspan.appendChild(replybtn);
+
+      obj.appendChild(actionspan);
+    }
+    else {
+      actionspan = null;
+    }
+
+    if (actionspan) {
+      actionspan.style.visibility = isover?'visible':'hidden';
+    }
+
+    obj.style.backgroundColor = isover?'#f7f7f7':'';
+  }
+}
+
 BetterMobileTwitter.prototype.functionPrinciple = function() {
   // check if it is a mobile version
   if (document.getElementById('dim-screen')) return;
@@ -542,7 +592,14 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
     status.parentNode.appendChild(filter);
   }
 
-  // Change the older link for scroll detector
+  // setup mouseover and mouseout event
+  var tweetslilist = document.evaluate("//html:div[@id='bmt-tweetsdiv']//html:li", document, this.nsResolver, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (var i=0;i<tweetslilist.snapshotLength;i++) {
+    tweetslilist.snapshotItem(i).addEventListener('mouseover', function(e) { bmt.onMouseOverOutTweets(e.target, true); }, false);
+    tweetslilist.snapshotItem(i).addEventListener('mouseout', function(e) { bmt.onMouseOverOutTweets(e.target, false); }, false);
+  }
+
+  // change the older link for scroll detector
   var res = document.getElementsByTagName('a');
   for (var i=res.length-1; i>=0; i--) {
     if (res[i].getAttribute('accesskey') == 6) {
@@ -579,6 +636,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   htmlholder.style.display = 'none';
   document.body.appendChild(htmlholder);
 
+  // expand URL
   this.expandUrl(3);
 
   window.setInterval(function() {bmt.detectScroll(bmt);}, 500);
