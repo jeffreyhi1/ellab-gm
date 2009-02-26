@@ -486,10 +486,11 @@ BetterMobileTwitter.prototype.onMouseOverOutTweets = function(obj, isover) {
       actionspan = document.createElement('span');
       actionspan.setAttribute('bmt-actionspan', 'true');
       // tweets div is 80% width, so use right: 22%
-      actionspan.setAttribute('style', 'position: absolute; right: 22%; cursor:pointer; padding:3px;');
+      actionspan.setAttribute('style', 'position: absolute; right: 22%;');
 
       var replybtn = document.createElement('img');
       replybtn.src = 'http://static.twitter.com/images/icon_reply.gif';
+      replybtn.setAttribute('style', 'cursor:pointer; padding:5px;');
       replybtn.addEventListener('click', function(e) {
         var status = document.getElementById('status');
         if (status) {
