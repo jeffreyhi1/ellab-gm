@@ -482,7 +482,7 @@ BetterMobileTwitter.prototype.onMouseOverOutTweets = function(obj, isover) {
     if (actionspan.length > 0 && actionspan[actionspan.length - 1].getAttribute('bmt-actionspan')) {
       actionspan = actionspan[actionspan.length - 1];
     }
-    else if (isover) {
+    else if (isover && this.myname != obj.getElementsByTagName('a')[0].textContent) {
       actionspan = document.createElement('span');
       actionspan.setAttribute('bmt-actionspan', 'true');
       // tweets div is 80% width, so use right: 22%
@@ -498,6 +498,7 @@ BetterMobileTwitter.prototype.onMouseOverOutTweets = function(obj, isover) {
           // ignore if already start with the replyto string
           if (!status.value.match('^' + replyto)) {
             status.value = replyto + ' ' + status.value.replace(replyto, '');
+            status.focus();
           }
         }
       }, false);
