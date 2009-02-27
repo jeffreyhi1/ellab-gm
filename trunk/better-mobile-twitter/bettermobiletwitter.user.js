@@ -397,9 +397,9 @@ BetterMobileTwitter.prototype.expandUrl_flickr = function(bmt, a, url, t) {
 }
 
 BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
-  var res = url.match(/[\?|&]v=([a-zA-Z0-9]*)(&.*$)?/);
+  var res = url.match(/[\?|&]v=([a-zA-Z0-9_]*)(&.*$)?/);
   if (res) {
-    a.innerHTML = a.innerHTML.replace(/([\?|&]v=[a-zA-Z0-9]*)(&.*$)/, '$1&amp;...');
+    a.innerHTML = a.innerHTML.replace(/([\?|&]v=[a-zA-Z0-9_]*)(&.*$)/, '$1&amp;...');
 
     bmt.expandUrl_image(a, url, 'http://i4.ytimg.com/vi/' + res[1] + '/default.jpg');
   }
