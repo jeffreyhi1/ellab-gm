@@ -58,6 +58,7 @@ function BetterMobileTwitter() {
     {name:'isgd',     func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/is\.gd\/[a-zA-z0-9]+$/},
     {name:'bitly',    func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/bit\.ly\/[a-zA-z0-9]+$/},
     {name:'twurl',    func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/twurl\.nl\/[a-zA-z0-9]+$/},
+    {name:'shortto',  func:this.expandUrl_tinyurl,  ajax:true,  regex:/http:\/\/short\.to\/[a-zA-z0-9]+$/},
     {name:'hellotxt', func:this.expandUrl_hellotxt, ajax:true,  regex:/http:\/\/hellotxt\.com\/[a-zA-z0-9]+$/},
     //{name:'funp',     func:this.expandUrl_tinyurl, ajax:true,  regex:/http:\/\/funp\.com\//},
     {name:'twitpic',  func:this.expandUrl_twitpic,  ajax:true,  regex:/http:\/\/twitpic\.com\/[a-zA-z0-9]+$/},
