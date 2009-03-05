@@ -314,6 +314,17 @@ BetterMobileTwitter.prototype.sessionStorageWrapper = function(url, obj, key, fu
   return data;
 }
 
+BetterMobileTwitter.prototype.sessionStorageWrapper_image = function(a, url, obj, key, func) {
+  var imgUrl = this.sessionStorageWrapper(url, obj, key, func);
+
+  if (imgUrl) {
+    this.expandUrl_image(a, url, imgUrl);
+  }
+  else{
+    this.expandUrl(1);
+  }
+}
+
 BetterMobileTwitter.prototype.expandUrl_tinyurl = function(bmt, a, url, t) {
   var finalUrl = bmt.sessionStorageWrapper(url, t, 'tinyurl', function() {
     return t.finalUrl;
@@ -356,13 +367,9 @@ BetterMobileTwitter.prototype.expandUrl_hellotxt = function(bmt, a, url, t) {
 }
 
 BetterMobileTwitter.prototype.expandUrl_twitpic = function(bmt, a, url, t) {
-  var imgUrl = bmt.sessionStorageWrapper(url, t, 'twitpic', function() {
+  bmt.sessionStorageWrapper_image(a, url, t, 'twitpic', function() {
     return bmt.extract(bmt.extract(t.responseText, '<img id="pic"'), 'src="', '"');
   });
-
-  if (imgUrl) {
-    bmt.expandUrl_image(a, url, imgUrl);
-  }
 }
 
 BetterMobileTwitter.prototype.expandUrl_tapulous = function(bmt, a, url, t) {
@@ -372,51 +379,32 @@ BetterMobileTwitter.prototype.expandUrl_tapulous = function(bmt, a, url, t) {
     a.innerHTML = a.innerHTML.replace(/([\?|&amp;]hash=[a-zA-Z0-9]{4})[a-zA-Z0-9]*/, '$1...');
   }
 
-  var imgUrl = bmt.sessionStorageWrapper(url, t, 'tapulous', function() {
+  bmt.sessionStorageWrapper_image(a, url, t, 'tapulous', function() {
     return bmt.extract(bmt.extract(bmt.extract(t.responseText, '<div id="post">'), '</div>'), 'img src="', '"');
   });
-
-  if (imgUrl) {
-    bmt.expandUrl_image(a, url, imgUrl);
-  }
 }
 
 BetterMobileTwitter.prototype.expandUrl_pingfmimg = function(bmt, a, url, t) {
-  var imgUrl = bmt.sessionStorageWrapper(url, t, 'pingfmimg', function() {
+  bmt.sessionStorageWrapper_image(a, url, t, 'pingfmimg', function() {
     return bmt.extract(bmt.extract(t.responseText, 'background:url(/_images/layout/loading.gif)'), '<img src="', '"');
   });
-
-  if (imgUrl) {
-    bmt.expandUrl_image(a, url, imgUrl);
-  }
 }
 
 
 BetterMobileTwitter.prototype.expandUrl_hellotxtimg = function(bmt, a, url, t) {
-  var imgUrl = bmt.sessionStorageWrapper(url, t, 'hellotxtimg', function() {
+  bmt.sessionStorageWrapper_image(a, url, t, 'hellotxtimg', function() {
     return bmt.extract(bmt.extract(t.responseText, '<div class="status_pic'), '<img src="', '"');
   });
-
-  if (imgUrl) {
-    bmt.expandUrl_image(a, url, imgUrl);
-  }
 }
 
 BetterMobileTwitter.prototype.expandUrl_flickr = function(bmt, a, url, t) {
-  var imgUrl = bmt.sessionStorageWrapper(url, t, 'flickr', function() {
+  bmt.sessionStorageWrapper_image(a, url, t, 'flickr', function() {
     var pid = url.match(/flickr\.com\/photos\/[^\/]+\/(\d+)/);
     if (pid) {
       return bmt.extract(bmt.extract(t.responseText, '<div id="photoImgDiv' + pid[1] + '"'), 'src="', '"');
     }
     return '';
   });
-
-  if (imgUrl) {
-    bmt.expandUrl_image(a, url, imgUrl);
-  }
-  else{
-    bmt.expandUrl(1);
-  }
 }
 
 BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
