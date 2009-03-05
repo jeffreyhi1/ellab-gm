@@ -50,23 +50,24 @@ function BetterMobileTwitter() {
     }
   };
   this.expandUrlMap = [
-    {name:'tinyurl',   func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/tinyurl\.com\/[a-zA-z0-9]+$/},
-    {name:'snipurl',   func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/snipurl\.com\/[a-zA-z0-9]+$/},
-    {name:'pingfm',    func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/ping\.fm\/[a-zA-z0-9]+$/},
-    {name:'ffim',      func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/ff\.im\/[a-zA-z0-9\-\|]+$/},
-    {name:'trim',      func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/tr\.im\/[a-zA-z0-9]+$/},
-    {name:'isgd',      func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/is\.gd\/[a-zA-z0-9]+$/},
-    {name:'bitly',     func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/bit\.ly\/[a-zA-z0-9]+$/},
-    {name:'twurl',     func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/twurl\.nl\/[a-zA-z0-9]+$/},
-    {name:'shortto',   func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/short\.to\/[a-zA-z0-9]+$/},
-    {name:'hellotxt',  func:this.expandUrl_hellotxt,  ajax:true,  regex:/http:\/\/hellotxt\.com\/[a-zA-z0-9]+$/},
-    //{name:'funp',      func:this.expandUrl_tinyurl,   ajax:true,  regex:/http:\/\/funp\.com\//},
-    {name:'twitpic',   func:this.expandUrl_twitpic,   ajax:true,  regex:/http:\/\/twitpic\.com\/[a-zA-z0-9]+$/},
-    {name:'tapulous',  func:this.expandUrl_tapulous,  ajax:true,  regex:/http:\/\/twinkle\.tapulous\.com\/index\.php\?hash=/},
-    {name:'flickr',    func:this.expandUrl_flickr,    ajax:true,  regex:/(www\.)?flickr\.com\/photos/},
-    {name:'pingfmimg', func:this.expandUrl_pingfmimg, ajax:true,  regex:/http:\/\/ping\.fm\/p\/[a-zA-z0-9]+$/},
-    {name:'youtube',   func:this.expandUrl_youtube,   ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
-    {name:'img',       func:this.expandUrl_img,       ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/}
+    {name:'tinyurl',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/tinyurl\.com\/[a-zA-z0-9]+$/},
+    {name:'snipurl',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/snipurl\.com\/[a-zA-z0-9]+$/},
+    {name:'pingfm',      func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/ping\.fm\/[a-zA-z0-9]+$/},
+    {name:'ffim',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/ff\.im\/[a-zA-z0-9\-\|]+$/},
+    {name:'trim',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/tr\.im\/[a-zA-z0-9]+$/},
+    {name:'isgd',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/is\.gd\/[a-zA-z0-9]+$/},
+    {name:'bitly',       func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/bit\.ly\/[a-zA-z0-9]+$/},
+    {name:'twurl',       func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/twurl\.nl\/[a-zA-z0-9]+$/},
+    {name:'shortto',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/short\.to\/[a-zA-z0-9]+$/},
+    {name:'hellotxt',    func:this.expandUrl_hellotxt,    ajax:true,  regex:/http:\/\/hellotxt\.com\/[a-zA-z0-9]+$/},
+    //{name:'funp',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/funp\.com\//},
+    {name:'twitpic',     func:this.expandUrl_twitpic,     ajax:true,  regex:/http:\/\/twitpic\.com\/[a-zA-z0-9]+$/},
+    {name:'tapulous',    func:this.expandUrl_tapulous,    ajax:true,  regex:/http:\/\/twinkle\.tapulous\.com\/index\.php\?hash=/},
+    {name:'flickr',      func:this.expandUrl_flickr,      ajax:true,  regex:/(www\.)?flickr\.com\/photos/},
+    {name:'pingfmimg',   func:this.expandUrl_pingfmimg,   ajax:true,  regex:/http:\/\/ping\.fm\/p\/[a-zA-z0-9]+$/},
+    {name:'hellotxtimg', func:this.expandUrl_hellotxtimg, ajax:true,  regex:/http:\/\/hellotxt\.com\/i\/[a-zA-z0-9]+$/},
+    {name:'youtube',     func:this.expandUrl_youtube,     ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
+    {name:'img',         func:this.expandUrl_img,         ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/}
   ];
 }
 
@@ -381,8 +382,19 @@ BetterMobileTwitter.prototype.expandUrl_tapulous = function(bmt, a, url, t) {
 }
 
 BetterMobileTwitter.prototype.expandUrl_pingfmimg = function(bmt, a, url, t) {
-  var imgUrl = bmt.sessionStorageWrapper(url, t, 'tapulous', function() {
+  var imgUrl = bmt.sessionStorageWrapper(url, t, 'pingfmimg', function() {
     return bmt.extract(bmt.extract(t.responseText, 'background:url(/_images/layout/loading.gif)'), '<img src="', '"');
+  });
+
+  if (imgUrl) {
+    bmt.expandUrl_image(a, url, imgUrl);
+  }
+}
+
+
+BetterMobileTwitter.prototype.expandUrl_hellotxtimg = function(bmt, a, url, t) {
+  var imgUrl = bmt.sessionStorageWrapper(url, t, 'hellotxtimg', function() {
+    return bmt.extract(bmt.extract(t.responseText, '<div class="status_pic'), '<img src="', '"');
   });
 
   if (imgUrl) {
