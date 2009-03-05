@@ -297,17 +297,14 @@ BetterMobileTwitter.prototype.onUserFilterChanged = function(filter) {
 }
 
 BetterMobileTwitter.prototype.sessionStorageWrapper = function(url, obj, key, func) {
-  var data = '';
   key = key + '|';
   if (obj.value && obj.value.length > key.length && obj.value.substring(0, key.length) == key) {
-    data = obj.value.substring(key.length + 1);
+    return obj.value.substring(key.length + 1);
   }
 
-  if (data == '') {
-    data = func();
-    if (window.sessionStorage) {
-      window.sessionStorage.setItem(url, key + '|' + data);
-    }
+  var data = func();
+  if (window.sessionStorage) {
+    window.sessionStorage.setItem(url, key + '|' + data);
   }
 
   return data;
