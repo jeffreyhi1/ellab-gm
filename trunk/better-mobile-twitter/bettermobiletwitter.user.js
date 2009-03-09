@@ -68,7 +68,8 @@ function BetterMobileTwitter() {
     {name:'pingfmimg',   func:this.expandUrl_pingfmimg,   ajax:true,  regex:/http:\/\/ping\.fm\/p\/[a-zA-z0-9]+$/},
     {name:'hellotxtimg', func:this.expandUrl_hellotxtimg, ajax:true,  regex:/http:\/\/hellotxt\.com\/i\/[a-zA-z0-9]+$/},
     {name:'youtube',     func:this.expandUrl_youtube,     ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
-    {name:'img',         func:this.expandUrl_img,         ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/}
+    {name:'img',         func:this.expandUrl_img,         ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/},
+    {name:'googlelogin', func:this.expandUrl_googlelogin, ajax:false, regex:/^https?:\/\/[^\/]*\.google\.com?(\.[a-zA-Z]{1,2})?\/accounts\/ServiceLogin\?/},
   ];
 }
 
@@ -414,6 +415,15 @@ BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
 
 BetterMobileTwitter.prototype.expandUrl_img = function(bmt, a, url) {
   bmt.expandUrl_image(a, url, url);
+
+  bmt.expandUrl(1);
+}
+
+BetterMobileTwitter.prototype.expandUrl_googlelogin = function(bmt, a, url) {
+  var res = url.match(/&continue=(.*)/);
+  if (res) {
+    a.innerHTML = bmt.encodeHTML(decodeURIComponent(res[1]));
+  }
 
   bmt.expandUrl(1);
 }
