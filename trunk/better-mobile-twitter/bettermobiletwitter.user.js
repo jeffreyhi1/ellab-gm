@@ -651,10 +651,10 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   if (window.sessionStorage) {
     var clearTwitpic = document.createElement('input');
     clearTwitpic.type = 'button';
-    clearTwitpic.value = 'Clear Twitpic cache';
+    clearTwitpic.value = 'Clear TwitPic cache';
     clearTwitpic.className = 'b';
     clearTwitpic.setAttribute('style', 'position: absolute; right: 100px; font-size:10pt;');
-    clearTwitpic.title = 'Twitpic image URL may change after a while, clear cache to reload the image thumbnail';
+    clearTwitpic.title = 'TwitPic image URL may change after a while, clear cache to reload the image thumbnail';
     clearTwitpic.addEventListener('click', function(e) {
       var found = false;
       for (var i=0;i<window.sessionStorage.length;i++) {
