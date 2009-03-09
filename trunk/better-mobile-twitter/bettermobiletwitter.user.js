@@ -647,6 +647,31 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   checkUpdateSpan.setAttribute('style', 'position: absolute; right: 100px; top: 3px;');
   document.getElementsByTagName('div')[0].appendChild(checkUpdateSpan);
 
+  // clear twitpic session
+  if (window.sessionStorage) {
+    var clearTwitpic = document.createElement('input');
+    clearTwitpic.type = 'button';
+    clearTwitpic.value = 'Clear Twitpic cache';
+    clearTwitpic.className = 'b';
+    clearTwitpic.setAttribute('style', 'position: absolute; right: 100px; font-size:10pt;');
+    clearTwitpic.title = 'Twitpic image URL may change after a while, clear cache to reload the image thumbnail';
+    clearTwitpic.addEventListener('click', function(e) {
+      var found = false;
+      for (var i=0;i<window.sessionStorage.length;i++) {
+        var domkey = window.sessionStorage.key(i);
+        var domvalue = window.sessionStorage.getItem(domkey);
+        if (domvalue.value.match(/^twitpic\|/)) {
+          sessionStorage.removeItem(domkey);
+          found = true;
+        }
+      }
+      if (found) {
+        document.location.reload();
+      }
+    }, false);
+    document.getElementsByTagName('div')[0].appendChild(clearTwitpic);
+  }
+
   // on off button
   var onoff = document.createElement('img');
   onoff.src = bmt.onsrc;
