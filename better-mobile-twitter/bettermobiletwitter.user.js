@@ -585,7 +585,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   tweetsDiv.setAttribute('style', 'width:80%;');
   tweetsDiv.setAttribute('id', 'bmt-tweetsdiv');
   replyDiv.setAttribute('style', 'float:right; width:19%; min-height: 100px; margin-left:1%; margin-right:3px; padding:5px; font-size: 75%; ' +
-                                 'background:#f9ffe8;ecffbb; border:1px solid #87bc44; -moz-border-radius:5px;');
+                                 'background:#f9ffe8;ecffbb; border:1px solid #87bc44; -moz-border-radius:5px; -webkit-border-radius: 5px;');
   replyDiv.setAttribute('id', 'bmt-replydiv');
 
   tweetsUl.parentNode.insertBefore(replyDiv, tweetsUl);
