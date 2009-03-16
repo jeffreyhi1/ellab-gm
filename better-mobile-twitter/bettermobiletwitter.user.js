@@ -70,6 +70,7 @@ function BetterMobileTwitter() {
     {name:'youtube',     func:this.expandUrl_youtube,     ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
     {name:'img',         func:this.expandUrl_img,         ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/},
     {name:'googlelogin', func:this.expandUrl_googlelogin, ajax:false, regex:/^https?:\/\/[^\/]*\.google\.com?(\.[a-zA-Z]{1,2})?\/accounts\/ServiceLogin\?/},
+    {name:'longurl',     func:this.expandUrl_longurl,     ajax:false, regex:/.{101}/},
   ];
 }
 
@@ -425,6 +426,20 @@ BetterMobileTwitter.prototype.expandUrl_googlelogin = function(bmt, a, url) {
   if (res) {
     a.innerHTML = bmt.encodeHTML(decodeURIComponent(res[1]));
   }
+
+  bmt.expandUrl(1);
+}
+
+BetterMobileTwitter.prototype.expandUrl_longurl = function(bmt, a, url) {
+  var brokenurl = '';
+  var html = a.innerHTML;
+  while (html.length > 100) {
+    brokenurl = brokenurl + (brokenurl.length?' ':'') + html.substring(0, 100);
+    html = html.substring(100);
+  }
+  brokenurl = brokenurl + (brokenurl.length?' ':'') + html.substring(0, 100);
+
+  a.innerHTML = bmt.encodeHTML(brokenurl);
 
   bmt.expandUrl(1);
 }
