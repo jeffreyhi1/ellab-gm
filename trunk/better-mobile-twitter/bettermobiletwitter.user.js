@@ -112,8 +112,7 @@ BetterMobileTwitter.prototype.extract = function(s, prefix, suffix) {
   return s;
 }
 
-BetterMobileTwitter.prototype.extractTweetsHTML = function(fullt) {
-  var t = this.extract(fullt, '<ul>', '</ul>');
+BetterMobileTwitter.prototype.removeInvalidChar = function(t) {
   // Some tweets has special character, need to remove it
   for (var i=0;i<t.length;i++) {
     if (t.charCodeAt(i) < 32 && t.charCodeAt(i) != 10 && t.charCodeAt(i) != 13 && t.charCodeAt(i) != 9) {
@@ -123,6 +122,10 @@ BetterMobileTwitter.prototype.extractTweetsHTML = function(fullt) {
   }
 
   return t;
+}
+
+BetterMobileTwitter.prototype.extractTweetsHTML = function(fullt) {
+  return this.removeInvalidChar(this.extract(fullt, '<ul>', '</ul>'));
 }
 
 BetterMobileTwitter.prototype.nextPage = function() {
@@ -181,7 +184,8 @@ BetterMobileTwitter.prototype.nextPage = function() {
 }
 
 BetterMobileTwitter.prototype.loadReplies = function() {
-  document.getElementById('bmt-replydiv').innerHTML = 'Loading replies...';
+  var replyDiv = document.getElementById('bmt-replydiv');
+  replyDiv.innerHTML = 'Loading replies ...';
 
   var bmt = this;
   var client = new XMLHttpRequest();
@@ -189,14 +193,72 @@ BetterMobileTwitter.prototype.loadReplies = function() {
     if (this.readyState == 4) {
       if (this.status == 200) {
         var t = bmt.extractTweetsHTML(this.responseText);
-        document.getElementById('bmt-replydiv').innerHTML = '<div class="s" style="font-size:133%;"><b>replies</b></div><ul>' + t + '</ul>';
+        replyDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>replies</b></div><ul>' + t + '</ul>';
       }
       else {
-        document.getElementById('bmt-replydiv').innerHTML = 'Error ' + this.status;
+        replyDiv.innerHTML = 'Error ' + this.status;
       }
     }
   }
   client.open('GET', 'http://m.twitter.com/replies');
+  client.send(null);
+}
+
+
+BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
+  var directMessageDiv = document.getElementById('bmt-directdiv');
+  directMessageDiv.innerHTML = 'Loading direct messages ...';
+
+  var bmt = this;
+  var client = new XMLHttpRequest();
+  client.onreadystatechange = function() {
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        var olbody = bmt.extract(this.responseText, '<ol class="statuses" id="timeline">', '</ol>');
+        //t = t.replace(/id="[^"]*"/g, '');
+        //t = t.replace(/<img[^>]*>/g, '');
+        var cont = true;
+        var count = 0;
+        var html = '';
+        while (cont) {
+          var t = bmt.extract(olbody, '<li', '</li>');
+          if (t) {
+            t = bmt.extract(t, 'status-body">', '<span class="action');
+            t = t.replace(/<span class="published">([^<]*)<\/span>/, '<small>$1</small>');
+            t = t.replace(/<\/?span[^>]*>/g, '');
+            t = t.replace(/\s+class="[^"]*"/g, '');
+            t = t.replace(/(<\/strong>)/, '$1 ');
+            t = t.replace(/(<small>)/, ' $1');
+            t = t.replace(/<img[^>]*>/g, '');
+            t = bmt.removeInvalidChar(t);
+            html = html + '<li' + (++count > displayCount?' style="display:none;"':'') + '>' + t + '</li>';
+
+            olbody = bmt.extract(olbody, '</li>');
+          }
+          else {
+            cont = false;
+          }
+        }
+        directMessageDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>direct messages</b>' +
+                                     (count > displayCount?' <a id="bmt-directdiv-expand" href="javascript:void(0)">[+]</a>':'') +
+                                     '</div><ul>' + html + '</ul>';
+        var expandLink = document.getElementById('bmt-directdiv-expand');
+        if (expandLink) {
+          expandLink.addEventListener('click', function(e) {
+            var lilist = directMessageDiv.getElementsByTagName('li');
+            for (var i=displayCount;i<lilist.length;i++) {
+              lilist[i].style.display = '';
+            }
+            e.target.parentNode.removeChild(e.target);
+          }, false);
+        }
+      }
+      else {
+        directMessageDiv.innerHTML = 'Error ' + this.status;
+      }
+    }
+  }
+  client.open('GET', 'http://m.twitter.com/direct_messages');
   client.send(null);
 }
 
@@ -292,7 +354,7 @@ BetterMobileTwitter.prototype.addUserFilter = function(filter, li) {
 BetterMobileTwitter.prototype.onUserFilterChanged = function(filter) {
   var name = filter.options[filter.selectedIndex].value;
 
-  var lis = document.getElementsByTagName('li');
+  var lis = document.getElementById('bmt-tweetsdiv').getElementsByTagName('li');
   for (var i=0; i<lis.length; i++) {
     if (filter.selectedIndex == 0 || lis[i].innerHTML.match('href="\/' + name + '"')) {
       lis[i].style.display = '';
@@ -578,19 +640,36 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   }
 
   // add replies layer
-  var replyDiv = document.createElement('div');
   var tweetsDiv = document.createElement('div');
+  var rightBarDiv = document.createElement('div');
   var tweetsUl = document.getElementsByTagName('ul')[0];
 
   tweetsDiv.setAttribute('style', 'width:80%;');
   tweetsDiv.setAttribute('id', 'bmt-tweetsdiv');
-  replyDiv.setAttribute('style', 'float:right; width:19%; min-height: 100px; margin-left:1%; margin-right:3px; padding:5px; font-size: 75%; ' +
-                                 'background:#f9ffe8;ecffbb; border:1px solid #87bc44; -moz-border-radius:5px; -webkit-border-radius: 5px;');
-  replyDiv.setAttribute('id', 'bmt-replydiv');
 
-  tweetsUl.parentNode.insertBefore(replyDiv, tweetsUl);
+
+  rightBarDiv.setAttribute('style', 'float:right; width:19%; margin-left:1%; margin-right:3px; ');
+
+  var directDiv = document.createElement('div');
+  directDiv.setAttribute('style', 'min-height: 100px; padding:5px; font-size: 75%; ' +
+                                 'background:#f9ffe8; border:1px solid #87bc44; ' +
+                                 '-moz-border-radius:5px; -webkit-border-radius: 5px;');
+  directDiv.setAttribute('id', 'bmt-directdiv');
+  directDiv.innerHTML = 'BBDBD';
+  rightBarDiv.appendChild(directDiv);
+
+  var replyDiv = document.createElement('div');
+  replyDiv.setAttribute('style', 'min-height: 100px; padding:5px; margin-top:8px; font-size: 75%; ' +
+                                 'background:#f9ffe8; border:1px solid #87bc44; ' +
+                                 '-moz-border-radius:5px; -webkit-border-radius: 5px;');
+  replyDiv.setAttribute('id', 'bmt-replydiv');
+  rightBarDiv.appendChild(replyDiv);
+
+  tweetsUl.parentNode.insertBefore(rightBarDiv, tweetsUl);
   tweetsUl.parentNode.insertBefore(tweetsDiv, tweetsUl);
   tweetsDiv.appendChild(tweetsUl);
+
+  this.loadDirectMessage(3);
   this.loadReplies();
 
   // modify status window
