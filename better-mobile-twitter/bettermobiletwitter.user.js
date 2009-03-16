@@ -669,7 +669,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   tweetsUl.parentNode.insertBefore(tweetsDiv, tweetsUl);
   tweetsDiv.appendChild(tweetsUl);
 
-  this.loadDirectMessage(3);
+  this.loadDirectMessage(2);
   this.loadReplies();
 
   // modify status window
