@@ -657,10 +657,18 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
     this.lastMessage = lastMessageLi[0].innerHTML;
     this.lastMessage = this.lastMessage.replace(/<small[^<]*<\/small>/, '');
   }
-  var checkUpdateSpan = document.createElement('span');
-  checkUpdateSpan.setAttribute('id', 'bmt-checkupdate');
-  checkUpdateSpan.setAttribute('style', 'position: absolute; right: 100px; top: 3px;');
-  document.getElementsByTagName('div')[0].appendChild(checkUpdateSpan);
+
+  // command panel
+  var commandPanel = document.createElement('div');
+  commandPanel.setAttribute('style', 'position: absolute; right: 0px; top: 0px;');
+  document.getElementsByTagName('div')[0].appendChild(commandPanel);
+
+  var checkUpdateDiv = document.createElement('div');
+  checkUpdateDiv.setAttribute('id', 'bmt-checkupdate');
+  checkUpdateDiv.setAttribute('style', 'float:left; margin:3px 5px 0px 0px;');
+  var checkUpdateContainer = document.createElement('span');
+  checkUpdateContainer.appendChild(checkUpdateDiv);
+  commandPanel.appendChild(checkUpdateContainer);
 
   // clear twitpic session
   if (window.sessionStorage) {
@@ -668,7 +676,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
     clearTwitpic.type = 'button';
     clearTwitpic.value = 'Clear TwitPic cache';
     clearTwitpic.className = 'b';
-    clearTwitpic.setAttribute('style', 'position: absolute; right: 100px; font-size:10pt;');
+    clearTwitpic.setAttribute('style', 'vertical-align:top; margin:3px 5px 0px 0px; font-size:10pt;');
     clearTwitpic.title = 'TwitPic image URL may change after a while, clear cache to reload the image thumbnail';
     clearTwitpic.addEventListener('click', function(e) {
       var found = false;
@@ -684,18 +692,18 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
         document.location.reload();
       }
     }, false);
-    document.getElementsByTagName('div')[0].appendChild(clearTwitpic);
+    commandPanel.appendChild(clearTwitpic);
   }
 
   // on off button
   var onoff = document.createElement('img');
   onoff.src = bmt.onsrc;
-  onoff.setAttribute('style', 'position: absolute; right: 0px; top: 0px; cursor:pointer;');
+  onoff.setAttribute('style', 'cursor:pointer;');
   onoff.addEventListener('click', function(e) {
     bmt.enabled = !bmt.enabled;
     e.target.src = bmt.enabled?bmt.onsrc:bmt.offsrc;
   }, false);
-  document.getElementsByTagName('div')[0].appendChild(onoff);
+  commandPanel.appendChild(onoff);
 
   // an element to convert text to HTML, for comparing last message
   var htmlholder = document.createElement('span');
