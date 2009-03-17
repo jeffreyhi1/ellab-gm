@@ -236,12 +236,19 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
           var t = bmt.extract(olbody, '<li', '</li>');
           if (t) {
             t = bmt.extract(t, 'status-body">', '<span class="action');
-            t = t.replace(/<span class="published">([^<]*)<\/span>/, '<small>$1</small>');
+            // span class="published" is the publish time, change to <small> as used in mobile version
+            t = t.replace(/<span class="published">([^<]*)<\/span>/, ' <small>$1</small>');
+            // remove all span tags
             t = t.replace(/<\/?span[^>]*>/g, '');
-            t = t.replace(/\s+class="[^"]*"/g, '');
-            t = t.replace(/(<\/strong>)/, '$1 ');
-            t = t.replace(/(<small>)/, ' $1');
+            // remove all image tags
             t = t.replace(/<img[^>]*>/g, '');
+            // remove all class attribute
+            t = t.replace(/\s+class="[^"]*"/g, '');
+            // remove all title attribute
+            t = t.replace(/\s+title="[^"]*"/g, '');
+            // add spaces after the username
+            t = t.replace(/(<\/strong>)/, '$1 ');
+            // finally remove invalid chars
             t = bmt.removeInvalidChar(t);
             html = html + '<li' + (++count > displayCount?' style="display:none;"':'') + '>' + t + '</li>';
 
