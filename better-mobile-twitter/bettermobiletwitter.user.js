@@ -625,6 +625,11 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   // check if it is a mobile version
   if (document.getElementById('dim-screen')) return;
 
+  var status = document.getElementById('status');
+
+  // check if any connection error
+  if (!status) return;
+
   var bmt = this;
 
   this.page = document.location.href.match(/page=(\d+)/);
@@ -673,7 +678,6 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   this.loadReplies();
 
   // modify status window
-  var status = document.getElementById('status');
   if (status) {
     // remove the BR between status editbox and update button
     var br = status.nextSibling;
