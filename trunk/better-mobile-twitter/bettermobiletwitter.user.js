@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Better Mobile Twitter
-// @version         4
+// @version         5
 // @namespace       http://ellab.org
 // @author          angusdev
 // @description     To enhance the mobile twitter page
@@ -10,9 +10,21 @@
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2009-02-20
+Date:   2009-03-17
 
 Version history:
+5    17-Mar-2009    Add direct messages sidebar
+                    Add replies sidebar
+                    Add reply button for tweets
+                    Detect if cannot load the page and quit the script
+                    ExpandUrl supports tr.im, short.to, twurl.nl
+                    ExpandUrl supports url with ellipse
+                    ExpandUrl matches url better for ff.im, youtube and hellotxt
+                    ExpandUrl image supports ping.fm and hellotxt
+                    ExpandUrl will directly show the continue url if need to login google account
+                    ExpandUrl will add spaces in really long url to make sure it will wrap
+                    Add a clear TwitPic cache button
+                    Fix the bug that exception raised when url stored in sessionStorage is empty string
 4    20-Feb-2009    Auto expand short URL
                     Image and Youtube preview
                     Filter by user
