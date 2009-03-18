@@ -81,6 +81,7 @@ function BetterMobileTwitter() {
     {name:'flickr',      func:this.expandUrl_flickr,      ajax:true,  regex:/(www\.)?flickr\.com\/photos/},
     {name:'pingfmimg',   func:this.expandUrl_pingfmimg,   ajax:true,  regex:/http:\/\/ping\.fm\/p\/[a-zA-z0-9]+$/},
     {name:'hellotxtimg', func:this.expandUrl_hellotxtimg, ajax:true,  regex:/http:\/\/hellotxt\.com\/i\/[a-zA-z0-9]+$/},
+    {name:'skitch',      func:this.expandUrl_skitch,      ajax:true,  regex:/http:\/\/skitch\.com\//},
     {name:'youtube',     func:this.expandUrl_youtube,     ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
     {name:'img',         func:this.expandUrl_img,         ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/},
     {name:'googlelogin', func:this.expandUrl_googlelogin, ajax:false, regex:/^https?:\/\/[^\/]*\.google\.com?(\.[a-zA-Z]{1,2})?\/accounts\/ServiceLogin\?/},
@@ -506,6 +507,12 @@ BetterMobileTwitter.prototype.expandUrl_flickr = function(bmt, a, url, t) {
       return bmt.extract(bmt.extract(t.responseText, '<div id="photoImgDiv' + pid[1] + '"'), 'src="', '"');
     }
     return '';
+  });
+}
+
+BetterMobileTwitter.prototype.expandUrl_skitch = function(bmt, a, url, t) {
+  bmt.sessionStorageWrapper_image(a, url, t, 'skitch', function() {
+    return bmt.extract(t.responseText, "plasq.mySkitch.selectCopyContainer.addSelectCopy( 'Image only', '", "'");
   });
 }
 
