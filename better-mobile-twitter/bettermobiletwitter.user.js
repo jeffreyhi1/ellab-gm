@@ -73,6 +73,7 @@ function BetterMobileTwitter() {
     {name:'shortto',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/short\.to\/[a-zA-z0-9]+$/},
     {name:'hellotxt',    func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/hellotxt\.com\/l\/[a-zA-z0-9]+$/},
     {name:'hellotxttxt', func:this.expandUrl_hellotxt,    ajax:true,  regex:/http:\/\/hellotxt\.com\/[a-zA-z0-9]+$/},
+    {name:'burnurl',     func:this.expandUrl_burnurl,     ajax:true,  regex:/http:\/\/burnurl\.com\/[a-zA-z0-9]+$/},
     //{name:'funp',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/funp\.com\//},
     {name:'twitpic',     func:this.expandUrl_twitpic,     ajax:true,  regex:/http:\/\/twitpic\.com\/[a-zA-z0-9]+$/},
     {name:'tapulous',    func:this.expandUrl_tapulous,    ajax:true,  regex:/http:\/\/twinkle\.tapulous\.com\/index\.php\?hash=/},
@@ -440,6 +441,27 @@ BetterMobileTwitter.prototype.expandUrl_hellotxt = function(bmt, a, url, t) {
   t = bmt.extract(bmt.extract(t.responseText, '<div class="history-row big">'), '<p>', '</p>');
   if (t) {
     a.innerHTML = t;
+  }
+
+  bmt.expandUrl(1);
+}
+
+
+BetterMobileTwitter.prototype.expandUrl_burnurl = function(bmt, a, url, t) {
+  var finalUrl = bmt.sessionStorageWrapper(url, t, 'burnurl', function() {
+    var res = t.responseText.match(/<frame [^>]*src="([^"]+)" [^>]*id="bottomFrame"[^>]*>/);
+    if (res) {
+      return res[1];
+    }
+    else {
+      return null;
+    }
+  });
+
+  if (finalUrl && url != finalUrl) {
+    a.innerHTML = bmt.encodeHTML(decodeURIComponent(finalUrl));
+    a.href = finalUrl;
+    a.setAttribute('bmt-finalurl', finalUrl);
   }
 
   bmt.expandUrl(1);
