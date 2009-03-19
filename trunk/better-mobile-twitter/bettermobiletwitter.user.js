@@ -475,16 +475,17 @@ BetterMobileTwitter.prototype.onUserFilterChanged = function(filter) {
 }
 
 BetterMobileTwitter.prototype.sessionStorageWrapper = function(url, obj, key, func) {
+  if (!window.sessionStorage) {
+    return func();
+  }
+
   key = key + '|';
   if (obj.value && obj.value.length > key.length && obj.value.substring(0, key.length) == key) {
     return obj.value.substring(key.length + 1);
   }
 
   var data = func();
-  if (window.sessionStorage) {
-    window.sessionStorage.setItem(url, key + '|' + data);
-  }
-
+  window.sessionStorage.setItem(url, key + '|' + data);
   return data;
 }
 
@@ -675,7 +676,12 @@ BetterMobileTwitter.prototype.expandOneUrl = function(a) {
   for (var j=0;j<this.expandUrlMap.length;j++) {
     if (url.match(this.expandUrlMap[j].regex)) {
       if (this.expandUrlMap[j].ajax) {
-        this.expandOneUrl_ajaxWrapper(this, a, url, this.expandUrlMap[j].func);
+        if (this.supportXSS) {
+          this.expandOneUrl_ajaxWrapper(this, a, url, this.expandUrlMap[j].func);
+        }
+        else {
+          return false;
+        }
       }
       else {
         this.expandUrlMap[j].func(this, a, url);
@@ -696,8 +702,6 @@ BetterMobileTwitter.prototype.expandOneUrl = function(a) {
 }
 
 BetterMobileTwitter.prototype.expandUrl = function(maxRun) {
-  if (!this.supportXSS) return;
-
   var res = document.evaluate("//html:div[@id='bmt-tweetsdiv']//html:a[not(@bmt-expandurl)]", document, this.nsResolver, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
   var loadcount = 0;
   for (var i=0;i<res.snapshotLength;i++) {
