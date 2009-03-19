@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Google Reader Unread Count
-// @version         4
+// @version         5
 // @namespace       http://ellab.org/
 // @author          angusdev
 // @description     Display actual unread count instead of "1000+" in Google Reader
@@ -10,9 +10,11 @@
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2007-09-27
+Date:   2009-03-20
 
 Version history:
+5    20-Mar-2009    Change the window title to (xxx) Google Reader
+                    Listen to DOMTitleChanged event (gecko specified) so can response faster window title changed by Google
 4    12-Nov-2008    Support Chrome
                     Fix the bug that didn't show the '+' sign in total if a feed has 1000+ unread items
 3    06-Nov-2008    Fix the problem due to Google changed DOM
@@ -39,23 +41,29 @@ var GReaderUnreadCount = {
   waitForReady:function() {
     if (document.getElementById('reading-list-unread-count')) {
       document.getElementById('reading-list-unread-count').addEventListener('DOMSubtreeModified', GReaderUnreadCount.modifySubtree, false);
+      window.addEventListener("DOMTitleChanged", GReaderUnreadCount.titleChanged, false);
       window.setTimeout(GReaderUnreadCount.modifySubtree, 5000);
-
-      window.setInterval(function() {
-        GReaderUnreadCount.calcUnread();
-        if (GReaderUnreadCount.totaltext) {
-          document.title = document.title.replace(/1000\+/, GReaderUnreadCount.totaltext).replace('Google Reader', 'GReader');
-        }
-      }, 3000);
+      window.setInterval(GReaderUnreadCount.titleChanged, 3000);
     }
     else {
      setTimeout(GReaderUnreadCount.waitForReady, 500);
     }
   },
 
+
   modifySubtree:function() {
     if (document.getElementById('reading-list-unread-count').textContent.match(/1000\+/)) {
       GReaderUnreadCount.calcUnread();
+    }
+  },
+
+  titleChanged:function() {
+    GReaderUnreadCount.calcUnread();
+    if (GReaderUnreadCount.totaltext) {
+      var newTitle = '(' + GReaderUnreadCount.totaltext + ') ' + document.title.replace(/\s*\(\d+\+?\)$/, '').replace(/^\(\d+\+?\)\s*/, '');;
+      if (document.title != newTitle) {
+        document.title = newTitle;
+      }
     }
   },
 
