@@ -238,8 +238,6 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
 
       if (this.status == 200) {
         var olbody = bmt.extract(this.responseText, '<ol class="statuses" id="timeline">', '</ol>');
-        //t = t.replace(/id="[^"]*"/g, '');
-        //t = t.replace(/<img[^>]*>/g, '');
         var cont = true;
         var count = 0;
         var html = '';
@@ -305,17 +303,15 @@ BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
       mentionDiv.style.minHeight = '';
 
       var olbody = bmt.extract(t.responseText, '<div id="results">');
-      //t = t.replace(/id="[^"]*"/g, '');
-      //t = t.replace(/<img[^>]*>/g, '');
       var cont = true;
       var count = 0;
       var html = '';
       while (cont) {
         var t = bmt.extract(olbody, '<li class="result', '</li>');
         if (t) {
-          t = bmt.extract(t, '<div class="msg">', '<div class="info">');
-          // span class="published" is the publish time, change to <small> as used in mobile version
-          //t = t.replace(/<span class="published">([^<]*)<\/span>/, ' <small>$1</small>');
+          t = bmt.extract(t, '<div class="msg">', '<span class="source">');
+          // change div class=info to small to display the tweets time
+          t = t.replace(/<div class="info">\s*(.*)\s*$/m, '<small>$1</small>');
           // remove all span tags
           t = t.replace(/<\/?span[^>]*>/g, '');
           // remove all span tags
