@@ -213,7 +213,10 @@ BetterMobileTwitter.prototype.loadReplies = function() {
 
       if (this.status == 200) {
         var t = bmt.extractTweetsHTML(this.responseText);
-        replyDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>replies</b></div><ul>' + t + '</ul>';
+        replyDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
+                             '<a href="http://m.twitter.com/replies"><b>replies</b></a>' +
+                             '</div><ul>' + t + '</ul>';
+
       }
       else {
         replyDiv.innerHTML = 'Error ' + this.status;
@@ -267,7 +270,8 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
             cont = false;
           }
         }
-        directMessageDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>direct messages</b>' +
+        directMessageDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
+                                     '<a href="http://m.twitter.com/direct_messages"><b>direct messages</b></a>' +
                                      (count > displayCount?' <a id="bmt-directdiv-expand" href="javascript:void(0)">[+]</a>':'') +
                                      '</div><ul>' + html + '</ul>';
         var expandLink = document.getElementById('bmt-directdiv-expand');
@@ -336,7 +340,8 @@ BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
           cont = false;
         }
       }
-      mentionDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>@mentions</b>' +
+      mentionDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
+                             '<a href="http://search.twitter.com/search?q=%40' + bmt.myname + '"><b>@mentions</b></a>' +
                              (count > displayCount?' <a id="bmt-mentiondiv-expand" href="javascript:void(0)">[+]</a>':'') +
                              '</div><ul>' + html + '</ul>';
       var expandLink = document.getElementById('bmt-mentiondiv-expand');
