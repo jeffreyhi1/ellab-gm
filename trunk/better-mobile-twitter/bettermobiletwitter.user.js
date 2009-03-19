@@ -284,6 +284,66 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
   client.send(null);
 }
 
+BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
+  var mentionDiv = document.getElementById('bmt-mentiondiv');
+  mentionDiv.innerHTML = 'Loading @mentions ...';
+
+  var bmt = this;
+  GM_xmlhttpRequest({
+    method: 'GET',
+    url: 'http://search.twitter.com/search?q=%40' + bmt.myname,
+    onload: function(t) {
+      var olbody = bmt.extract(t.responseText, '<div id="results">');
+      //t = t.replace(/id="[^"]*"/g, '');
+      //t = t.replace(/<img[^>]*>/g, '');
+      var cont = true;
+      var count = 0;
+      var html = '';
+      while (cont) {
+        var t = bmt.extract(olbody, '<li class="result', '</li>');
+        if (t) {
+          t = bmt.extract(t, '<div class="msg">', '<div class="info">');
+          // span class="published" is the publish time, change to <small> as used in mobile version
+          //t = t.replace(/<span class="published">([^<]*)<\/span>/, ' <small>$1</small>');
+          // remove all span tags
+          t = t.replace(/<\/?span[^>]*>/g, '');
+          // remove all span tags
+          t = t.replace(/<\/?div[^>]*>/g, '');
+          // remove all target attribute
+          t = t.replace(/\s+target="[^"]*"/g, '');
+          // remove all onclick attribute
+          t = t.replace(/\s+onclick="[^"]*"/g, '');
+          // finally remove invalid chars
+          t = bmt.removeInvalidChar(t);
+
+          var checkIsReply = t.match(/<a href="[^"]+"[^>]*>[^<]*<\/a>: <a href="([^"]+)"/);
+          if (!checkIsReply || !checkIsReply[1].match('\\/' + bmt.myname + '$')) {
+            html = html + '<li' + (++count > displayCount?' style="display:none;"':'') + '>' + t + '</li>';
+          }
+
+          olbody = bmt.extract(olbody, '</li>');
+        }
+        else {
+          cont = false;
+        }
+      }
+      mentionDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>@mentions</b>' +
+                             (count > displayCount?' <a id="bmt-mentiondiv-expand" href="javascript:void(0)">[+]</a>':'') +
+                             '</div><ul>' + html + '</ul>';
+      var expandLink = document.getElementById('bmt-mentiondiv-expand');
+      if (expandLink) {
+        expandLink.addEventListener('click', function(e) {
+          var lilist = mentionDiv.getElementsByTagName('li');
+          for (var i=displayCount;i<lilist.length;i++) {
+            lilist[i].style.display = '';
+          }
+          e.target.parentNode.removeChild(e.target);
+        }, false);
+      }
+    }
+  });
+}
+
 BetterMobileTwitter.prototype.calcOffsetTop = function(e) {
   var top = 0;
   do {
@@ -706,11 +766,17 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
 
   var directDiv = document.createElement('div');
   directDiv.setAttribute('style', 'min-height: 100px; padding:5px; font-size: 75%; ' +
-                                 'background:#f9ffe8; border:1px solid #87bc44; ' +
-                                 '-moz-border-radius:5px; -webkit-border-radius: 5px;');
+                                  'background:#f9ffe8; border:1px solid #87bc44; ' +
+                                  '-moz-border-radius:5px; -webkit-border-radius: 5px;');
   directDiv.setAttribute('id', 'bmt-directdiv');
-  directDiv.innerHTML = 'BBDBD';
   rightBarDiv.appendChild(directDiv);
+
+  var mentionDiv = document.createElement('div');
+  mentionDiv.setAttribute('style', 'min-height: 100px; padding:5px; margin-top:8px; font-size: 75%; ' +
+                                   'background:#f9ffe8; border:1px solid #87bc44; ' +
+                                   '-moz-border-radius:5px; -webkit-border-radius: 5px;');
+  mentionDiv.setAttribute('id', 'bmt-mentiondiv');
+  rightBarDiv.appendChild(mentionDiv);
 
   var replyDiv = document.createElement('div');
   replyDiv.setAttribute('style', 'min-height: 100px; padding:5px; margin-top:8px; font-size: 75%; ' +
@@ -724,6 +790,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   tweetsDiv.appendChild(tweetsUl);
 
   this.loadDirectMessage(2);
+  this.loadMentions(2);
   this.loadReplies();
 
   // modify status window
