@@ -298,18 +298,17 @@ BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
   var mentionDiv = document.getElementById('bmt-mentiondiv');
   mentionDiv.innerHTML = 'Loading @mentions ...';
 
+  this.loadMentionsPage(mentionDiv, displayCount, 1, '', 0);
+}
+
+BetterMobileTwitter.prototype.loadMentionsPage = function(mentionDiv, displayCount, page, html, mentionsCount) {
   var bmt = this;
   GM_xmlhttpRequest({
     method: 'GET',
-    url: 'http://search.twitter.com/search?q=%40' + bmt.myname,
+    url: 'http://search.twitter.com/search?q=%40' + bmt.myname + (page>1?'&page='+page:''),
     onload: function(t) {
-      // Since the layer has set the min-height style, clear it so it won't take up too much space if no message
-      mentionDiv.style.minHeight = '';
-
       var olbody = bmt.extract(t.responseText, '<div id="results">');
       var cont = true;
-      var count = 0;
-      var html = '';
       while (cont) {
         var t = bmt.extract(olbody, '<li class="result', '</li>');
         if (t) {
@@ -331,7 +330,7 @@ BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
 
           var checkIsReply = t.match(/<a href="[^"]+"[^>]*>[^<]*<\/a>: <a href="([^"]+)"/);
           if (!checkIsReply || !checkIsReply[1].match('\\/' + bmt.myname + '$')) {
-            html = html + '<li' + (++count > displayCount?' style="display:none;"':'') + '>' + t + '</li>';
+            html = html + '<li' + (++mentionsCount > displayCount?' style="display:none;"':'') + '>' + t + '</li>';
           }
 
           olbody = bmt.extract(olbody, '</li>');
@@ -340,19 +339,27 @@ BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
           cont = false;
         }
       }
-      mentionDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
-                             '<a href="http://search.twitter.com/search?q=%40' + bmt.myname + '"><b>@mentions</b></a>' +
-                             (count > displayCount?' <a id="bmt-mentiondiv-expand" href="javascript:void(0)">[+]</a>':'') +
-                             '</div><ul>' + html + '</ul>';
-      var expandLink = document.getElementById('bmt-mentiondiv-expand');
-      if (expandLink) {
-        expandLink.addEventListener('click', function(e) {
-          var lilist = mentionDiv.getElementsByTagName('li');
-          for (var i=displayCount;i<lilist.length;i++) {
-            lilist[i].style.display = '';
-          }
-          e.target.parentNode.removeChild(e.target);
-        }, false);
+      if (page == 3 || (page > 1 && mentionsCount >= displayCount )) {
+        // Since the layer has set the min-height style, clear it so it won't take up too much space if no message
+        mentionDiv.style.minHeight = '';
+
+        mentionDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
+                               '<a href="http://search.twitter.com/search?q=%40' + bmt.myname + '"><b>@mentions</b></a>' +
+                               (mentionsCount > displayCount?' <a id="bmt-mentiondiv-expand" href="javascript:void(0)">[+]</a>':'') +
+                               '</div><ul>' + html + '</ul>';
+        var expandLink = document.getElementById('bmt-mentiondiv-expand');
+        if (expandLink) {
+          expandLink.addEventListener('click', function(e) {
+            var lilist = mentionDiv.getElementsByTagName('li');
+            for (var i=displayCount;i<lilist.length;i++) {
+              lilist[i].style.display = '';
+            }
+            e.target.parentNode.removeChild(e.target);
+          }, false);
+        }
+      }
+      else {
+        bmt.loadMentionsPage(mentionDiv, displayCount, ++page, html, mentionsCount);
       }
     }
   });
