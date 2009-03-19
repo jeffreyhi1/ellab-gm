@@ -42,6 +42,7 @@ Version history:
 
 function BetterMobileTwitter() {
   this.isChrome = false;
+  this.supportXSS = true;
   this.enabled = true;
   this.loading = false;
   this.page = 1;
@@ -102,6 +103,7 @@ BetterMobileTwitter.prototype.init = function() {
   if (navigator.userAgent.match(/Chrome/)) {
     this.enabled = document.location.href == 'http://m.twitter.com/home';
     this.isChrome = true;
+    this.supportXSS = false;
   }
 
   if (this.enabled && document.body) this.functionPrinciple();
@@ -206,6 +208,9 @@ BetterMobileTwitter.prototype.loadReplies = function() {
   var client = new XMLHttpRequest();
   client.onreadystatechange = function() {
     if (this.readyState == 4) {
+      // Since the layer has set the min-height style, clear it so it won't take up too much space if no message
+      replyDiv.style.minHeight = '';
+
       if (this.status == 200) {
         var t = bmt.extractTweetsHTML(this.responseText);
         replyDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>replies</b></div><ul>' + t + '</ul>';
@@ -228,6 +233,9 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
   var client = new XMLHttpRequest();
   client.onreadystatechange = function() {
     if (this.readyState == 4) {
+      // Since the layer has set the min-height style, clear it so it won't take up too much space if no message
+      directMessageDiv.style.minHeight = '';
+
       if (this.status == 200) {
         var olbody = bmt.extract(this.responseText, '<ol class="statuses" id="timeline">', '</ol>');
         //t = t.replace(/id="[^"]*"/g, '');
@@ -293,6 +301,9 @@ BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
     method: 'GET',
     url: 'http://search.twitter.com/search?q=%40' + bmt.myname,
     onload: function(t) {
+      // Since the layer has set the min-height style, clear it so it won't take up too much space if no message
+      mentionDiv.style.minHeight = '';
+
       var olbody = bmt.extract(t.responseText, '<div id="results">');
       //t = t.replace(/id="[^"]*"/g, '');
       //t = t.replace(/<img[^>]*>/g, '');
@@ -669,7 +680,7 @@ BetterMobileTwitter.prototype.expandOneUrl = function(a) {
 }
 
 BetterMobileTwitter.prototype.expandUrl = function(maxRun) {
-  if (this.isChrome) return;
+  if (this.supportXSS) return;
 
   var res = document.evaluate("//html:div[@id='bmt-tweetsdiv']//html:a[not(@bmt-expandurl)]", document, this.nsResolver, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
   var loadcount = 0;
@@ -771,12 +782,14 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   directDiv.setAttribute('id', 'bmt-directdiv');
   rightBarDiv.appendChild(directDiv);
 
-  var mentionDiv = document.createElement('div');
-  mentionDiv.setAttribute('style', 'min-height: 100px; padding:5px; margin-top:8px; font-size: 75%; ' +
-                                   'background:#f9ffe8; border:1px solid #87bc44; ' +
-                                   '-moz-border-radius:5px; -webkit-border-radius: 5px;');
-  mentionDiv.setAttribute('id', 'bmt-mentiondiv');
-  rightBarDiv.appendChild(mentionDiv);
+  if (this.supportXSS) {
+    var mentionDiv = document.createElement('div');
+    mentionDiv.setAttribute('style', 'min-height: 100px; padding:5px; margin-top:8px; font-size: 75%; ' +
+                                     'background:#f9ffe8; border:1px solid #87bc44; ' +
+                                     '-moz-border-radius:5px; -webkit-border-radius: 5px;');
+    mentionDiv.setAttribute('id', 'bmt-mentiondiv');
+    rightBarDiv.appendChild(mentionDiv);
+  }
 
   var replyDiv = document.createElement('div');
   replyDiv.setAttribute('style', 'min-height: 100px; padding:5px; margin-top:8px; font-size: 75%; ' +
@@ -790,7 +803,9 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   tweetsDiv.appendChild(tweetsUl);
 
   this.loadDirectMessage(2);
-  this.loadMentions(2);
+  if (this.supportXSS) {
+    this.loadMentions(2);
+  }
   this.loadReplies();
 
   // modify status window
