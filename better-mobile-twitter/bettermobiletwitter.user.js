@@ -320,6 +320,8 @@ BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
           t = t.replace(/\s+target="[^"]*"/g, '');
           // remove all onclick attribute
           t = t.replace(/\s+onclick="[^"]*"/g, '');
+          // change the search topic link
+          t = t.replace(/<a href="\/search\?([^"]*)/g, '<a href="http://search.twitter.com/search?$1');
           // finally remove invalid chars
           t = bmt.removeInvalidChar(t);
 
