@@ -584,7 +584,7 @@ BetterMobileTwitter.prototype.expandUrl_pingfmimg = function(bmt, a, url, t) {
 
 BetterMobileTwitter.prototype.expandUrl_hellotxtimg = function(bmt, a, url, t) {
   bmt.sessionStorageWrapper_image(a, url, t, 'hellotxtimg', function() {
-    return bmt.extract(bmt.extract(t.responseText, '<div class="status_pic'), '<img src="', '"');
+    return bmt.extract(bmt.extract(t.responseText, '<div class="status_pic'), ' src="', '"');
   });
 }
 
