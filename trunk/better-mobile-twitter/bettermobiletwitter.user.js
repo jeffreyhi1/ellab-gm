@@ -69,13 +69,14 @@ function BetterMobileTwitter() {
     }
   };
   this.expandUrlMap = [
-    {name:'tinyurl',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/tinyurl\.com\/[a-zA-z0-9]+$/},
+    {name:'tinyurl',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/tinyurl\.com\/[a-zA-z0-9]+/},
     {name:'snipurl',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/snipurl\.com\/[a-zA-z0-9]+$/},
     {name:'pingfm',      func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/ping\.fm\/[a-zA-z0-9]+$/},
     {name:'ffim',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/ff\.im\/[a-zA-z0-9\-\|]+$/},
     {name:'trim',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/tr\.im\/[a-zA-z0-9]+$/},
     {name:'isgd',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/is\.gd\/[a-zA-z0-9]+$/},
     {name:'bitly',       func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/bit\.ly\/[a-zA-z0-9]+$/},
+    {name:'bitlycom',    func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/bitly\.com\/[a-zA-z0-9]+$/},
     {name:'twurl',       func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/twurl\.nl\/[a-zA-z0-9]+$/},
     {name:'shortto',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/short\.to\/[a-zA-z0-9]+$/},
     {name:'snurl',       func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/snurl.com\/[a-zA-z0-9]+$/},
