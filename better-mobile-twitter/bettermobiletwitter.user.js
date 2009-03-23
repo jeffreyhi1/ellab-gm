@@ -18,6 +18,7 @@ Date:   2009-03-17
 Version history:
 6    (beta)         Add @mentions sidebar
                     Show link of direct messages, @mentions, replies to can see full page
+                    @mentions and direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
                     ExpandUrl supports burnurl.com, snurl.com, bitly.com
                     ExpandUrl image supports skitch.com
@@ -281,7 +282,7 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
             t = t.replace(/(<\/strong>)/, '$1 ');
             // finally remove invalid chars
             t = bmt.removeInvalidChar(t);
-            html = html + '<li' + (++count > displayCount?' style="display:none;"':'') + '>' + t + '</li>';
+            html = html + '<li' + (++count > displayCount?' class="bmt-moreitem" style="display:none;"':'') + '>' + t + '</li>';
 
             olbody = bmt.extract(olbody, '</li>');
           }
@@ -296,11 +297,12 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
         var expandLink = document.getElementById('bmt-directdiv-expand');
         if (expandLink) {
           expandLink.addEventListener('click', function(e) {
-            var lilist = directMessageDiv.getElementsByTagName('li');
-            for (var i=displayCount;i<lilist.length;i++) {
-              lilist[i].style.display = '';
+            var isExpand = e.target.textContent == '[+]';
+            var lilist = directMessageDiv.getElementsByClassName('bmt-moreitem');
+            for (var i=0;i<lilist.length;i++) {
+              lilist[i].style.display = isExpand?'':'none';
             }
-            e.target.parentNode.removeChild(e.target);
+            e.target.innerHTML = isExpand?'[-]':'[+]';
           }, false);
         }
       }
@@ -349,7 +351,7 @@ BetterMobileTwitter.prototype.loadMentionsPage = function(mentionDiv, displayCou
 
           var checkIsReply = t.match(/<a href="[^"]+"[^>]*>[^<]*<\/a>: <a href="([^"]+)"/);
           if (!checkIsReply || !checkIsReply[1].match('\\/' + bmt.myname + '$')) {
-            html = html + '<li' + (++mentionsCount > displayCount?' style="display:none;"':'') + '>' + t + '</li>';
+            html = html + '<li' + (++mentionsCount > displayCount?' class="bmt-moreitem" style="display:none;"':'') + '>' + t + '</li>';
           }
 
           olbody = bmt.extract(olbody, '</li>');
@@ -369,11 +371,12 @@ BetterMobileTwitter.prototype.loadMentionsPage = function(mentionDiv, displayCou
         var expandLink = document.getElementById('bmt-mentiondiv-expand');
         if (expandLink) {
           expandLink.addEventListener('click', function(e) {
-            var lilist = mentionDiv.getElementsByTagName('li');
-            for (var i=displayCount;i<lilist.length;i++) {
-              lilist[i].style.display = '';
+            var isExpand = e.target.textContent == '[+]';
+            var lilist = mentionDiv.getElementsByClassName('bmt-moreitem');
+            for (var i=0;i<lilist.length;i++) {
+              lilist[i].style.display = isExpand?'':'none';
             }
-            e.target.parentNode.removeChild(e.target);
+            e.target.innerHTML = isExpand?'[-]':'[+]';
           }, false);
         }
       }
