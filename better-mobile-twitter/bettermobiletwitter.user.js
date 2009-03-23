@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Better Mobile Twitter
-// @version         5
+// @version         6
 // @namespace       http://ellab.org
 // @author          angusdev
 // @description     To enhance the mobile twitter page
@@ -13,6 +13,14 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2009-03-17
 
 Version history:
+6    (beta)         Add @mentions sidebar
+                    Show link of direct messages, @mentions, replies to can see full page
+                    Add the switch to standard version button to page top
+                    ExpandUrl supports burnurl.com, snurl.com, bitly.com
+                    ExpandUrl image supports skitch.com
+                    ExpandUrl matches url better for tinyurl
+                    ExpandUrl fix the hellotxt image layout changed
+                    Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
 5    17-Mar-2009    Add direct messages sidebar
                     Add replies sidebar
                     Add reply button for tweets
