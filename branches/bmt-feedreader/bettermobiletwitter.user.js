@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Better Mobile Twitter
-// @version         5
+// @version         6
 // @namespace       http://ellab.org
 // @author          angusdev
 // @description     To enhance the mobile twitter page
@@ -13,6 +13,14 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2009-03-17
 
 Version history:
+6    (beta)         Add @mentions sidebar
+                    Show link of direct messages, @mentions, replies to can see full page
+                    Add the switch to standard version button to page top
+                    ExpandUrl supports burnurl.com, snurl.com, bitly.com
+                    ExpandUrl image supports skitch.com
+                    ExpandUrl matches url better for tinyurl
+                    ExpandUrl fix the hellotxt image layout changed
+                    Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
 5    17-Mar-2009    Add direct messages sidebar
                     Add replies sidebar
                     Add reply button for tweets
@@ -70,13 +78,14 @@ function BetterMobileTwitter() {
     }
   };
   this.expandUrlMap = [
-    {name:'tinyurl',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/tinyurl\.com\/[a-zA-z0-9]+$/},
+    {name:'tinyurl',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/tinyurl\.com\/[a-zA-z0-9]+/},
     {name:'snipurl',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/snipurl\.com\/[a-zA-z0-9]+$/},
     {name:'pingfm',      func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/ping\.fm\/[a-zA-z0-9]+$/},
     {name:'ffim',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/ff\.im\/[a-zA-z0-9\-\|]+$/},
     {name:'trim',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/tr\.im\/[a-zA-z0-9]+$/},
     {name:'isgd',        func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/is\.gd\/[a-zA-z0-9]+$/},
     {name:'bitly',       func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/bit\.ly\/[a-zA-z0-9]+$/},
+    {name:'bitlycom',    func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/bitly\.com\/[a-zA-z0-9]+$/},
     {name:'twurl',       func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/twurl\.nl\/[a-zA-z0-9]+$/},
     {name:'shortto',     func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/short\.to\/[a-zA-z0-9]+$/},
     {name:'snurl',       func:this.expandUrl_tinyurl,     ajax:true,  regex:/http:\/\/snurl.com\/[a-zA-z0-9]+$/},
@@ -984,6 +993,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   commandPanel.setAttribute('style', 'position: absolute; right: 0px; top: 0px;');
   document.getElementsByTagName('div')[0].appendChild(commandPanel);
 
+  // n new tweets label
   var checkUpdateDiv = document.createElement('div');
   checkUpdateDiv.setAttribute('id', 'bmt-checkupdate');
   checkUpdateDiv.setAttribute('style', 'float:left; margin:3px 5px 0px 0px;');
@@ -1014,6 +1024,21 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
       }
     }, false);
     commandPanel.appendChild(clearTwitpic);
+  }
+
+  // switch to standard button
+  var changeuiform = document.evaluate("//html:form[@action='/sessions/change_ui']", document, this.nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  if (changeuiform) {
+    var changeUiButton = document.createElement('input');
+    changeUiButton.type = 'button';
+    changeUiButton.value = 'Standard';
+    changeUiButton.className = 'b';
+    changeUiButton.setAttribute('style', 'vertical-align:top; margin:3px 5px 0px 0px; font-size:10pt;');
+    changeUiButton.title = 'View Twitter in Standard version';
+    changeUiButton.addEventListener('click', function(e) {
+      changeuiform.submit();
+    }, false);
+    commandPanel.appendChild(changeUiButton);
   }
 
   // on off button
