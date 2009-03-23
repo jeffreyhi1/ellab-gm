@@ -4,7 +4,10 @@
 // @namespace       http://ellab.org
 // @author          angusdev
 // @description     To enhance the mobile twitter page
-// @include         http://m.twitter.com/home
+// @include         http://twitter.com/*
+// @include         https://twitter.com/*
+// @include         http://m.twitter.com/*
+// @include         https://m.twitter.com/*
 // ==/UserScript==
 
 /*
@@ -15,12 +18,14 @@ Date:   2009-03-17
 Version history:
 6    (beta)         Add @mentions sidebar
                     Show link of direct messages, @mentions, replies to can see full page
+                    @mentions and direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
                     ExpandUrl supports burnurl.com, snurl.com, bitly.com
                     ExpandUrl image supports skitch.com
                     ExpandUrl matches url better for tinyurl
                     ExpandUrl fix the hellotxt image layout changed
                     Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
+                    @include more URLs instead of only http://m.twitter.com/home
 5    17-Mar-2009    Add direct messages sidebar
                     Add replies sidebar
                     Add reply button for tweets
@@ -117,7 +122,7 @@ BetterMobileTwitter.prototype.encodeHTML = function(t) {
 
 BetterMobileTwitter.prototype.init = function() {
   if (navigator.userAgent.match(/Chrome/)) {
-    this.enabled = document.location.href == 'http://m.twitter.com/home';
+    this.enabled = document.location.href.match(/^https?:\/\/(m\.)?twitter\.com\//)?true:false;
     this.isChrome = true;
     this.supportXSS = false;
   }
@@ -231,10 +236,10 @@ BetterMobileTwitter.prototype.nextPage = function() {
     }
   }
   if (this.viewingUsername) {
-    client.open('GET', 'http://m.twitter.com/account/profile.mobile?user=' + this.viewingUsername + '&page=' + (this.page + 1));
+    client.open('GET', document.location.protocol + '//' + document.location.host + '/account/profile.mobile?user=' + this.viewingUsername + '&page=' + (this.page + 1));
   }
   else {
-    client.open('GET', 'http://m.twitter.com/account/home.mobile?page=' + (this.page + 1));
+    client.open('GET', document.location.protocol + '//' + document.location.host + '/account/home.mobile?page=' + (this.page + 1));
   }
   client.send(null);
 }
@@ -253,7 +258,7 @@ BetterMobileTwitter.prototype.loadReplies = function() {
       if (this.status == 200) {
         var t = bmt.extractTweetsHTML(this.responseText);
         replyDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
-                             '<a href="http://m.twitter.com/replies"><b>replies</b></a>' +
+                             '<a href="http://' + document.location.host + '/replies"><b>replies</b></a>' +
                              '</div><ul>' + t + '</ul>';
 
       }
@@ -262,7 +267,7 @@ BetterMobileTwitter.prototype.loadReplies = function() {
       }
     }
   }
-  client.open('GET', 'http://m.twitter.com/replies');
+  client.open('GET', document.location.protocol + '//' + document.location.host + '/replies');
   client.send(null);
 }
 
@@ -300,7 +305,7 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
             t = t.replace(/(<\/strong>)/, '$1 ');
             // finally remove invalid chars
             t = bmt.removeInvalidChar(t);
-            html = html + '<li' + (++count > displayCount?' style="display:none;"':'') + '>' + t + '</li>';
+            html = html + '<li' + (++count > displayCount?' class="bmt-moreitem" style="display:none;"':'') + '>' + t + '</li>';
 
             olbody = bmt.extract(olbody, '</li>');
           }
@@ -309,17 +314,18 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
           }
         }
         directMessageDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
-                                     '<a href="http://m.twitter.com/direct_messages"><b>direct messages</b></a>' +
+                                     '<a href="http://' + document.location.host + '/direct_messages"><b>direct messages</b></a>' +
                                      (count > displayCount?' <a id="bmt-directdiv-expand" href="javascript:void(0)">[+]</a>':'') +
                                      '</div><ul>' + html + '</ul>';
         var expandLink = document.getElementById('bmt-directdiv-expand');
         if (expandLink) {
           expandLink.addEventListener('click', function(e) {
-            var lilist = directMessageDiv.getElementsByTagName('li');
-            for (var i=displayCount;i<lilist.length;i++) {
-              lilist[i].style.display = '';
+            var isExpand = e.target.textContent == '[+]';
+            var lilist = directMessageDiv.getElementsByClassName('bmt-moreitem');
+            for (var i=0;i<lilist.length;i++) {
+              lilist[i].style.display = isExpand?'':'none';
             }
-            e.target.parentNode.removeChild(e.target);
+            e.target.innerHTML = isExpand?'[-]':'[+]';
           }, false);
         }
 
@@ -341,7 +347,7 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
       }
     }
   }
-  client.open('GET', 'http://m.twitter.com/direct_messages');
+  client.open('GET', document.location.protocol + '//' + document.location.host + '/direct_messages');
   client.send(null);
 }
 
@@ -416,7 +422,7 @@ BetterMobileTwitter.prototype.loadMentionsPage = function(mentionDiv, displayCou
 
           var checkIsReply = t.match(/<a href="[^"]+"[^>]*>[^<]*<\/a>: <a href="([^"]+)"/);
           if (!checkIsReply || !checkIsReply[1].match('\\/' + bmt.myname + '$')) {
-            html = html + '<li' + (++mentionsCount > displayCount?' style="display:none;"':'') + '>' + t + '</li>';
+            html = html + '<li' + (++mentionsCount > displayCount?' class="bmt-moreitem" style="display:none;"':'') + '>' + t + '</li>';
           }
 
           olbody = bmt.extract(olbody, '</li>');
@@ -436,11 +442,12 @@ BetterMobileTwitter.prototype.loadMentionsPage = function(mentionDiv, displayCou
         var expandLink = document.getElementById('bmt-mentiondiv-expand');
         if (expandLink) {
           expandLink.addEventListener('click', function(e) {
-            var lilist = mentionDiv.getElementsByTagName('li');
-            for (var i=displayCount;i<lilist.length;i++) {
-              lilist[i].style.display = '';
+            var isExpand = e.target.textContent == '[+]';
+            var lilist = mentionDiv.getElementsByClassName('bmt-moreitem');
+            for (var i=0;i<lilist.length;i++) {
+              lilist[i].style.display = isExpand?'':'none';
             }
-            e.target.parentNode.removeChild(e.target);
+            e.target.innerHTML = isExpand?'[-]':'[+]';
           }, false);
         }
       }
@@ -519,7 +526,7 @@ BetterMobileTwitter.prototype.checkUpdate = function() {
       window.setTimeout(function() {bmt.checkUpdate(bmt);}, 60000);
     }
   }
-  client.open('GET', 'http://m.twitter.com/account/home.mobile');
+  client.open('GET', document.location.protocol + '//' + document.location.host + '/account/home.mobile');
   client.send(null);
 }
 
@@ -847,7 +854,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
 
   var status = document.getElementById('status');
 
-  // check if any connection error
+  // make sure the status input box is here
   if (!status) return;
 
   var bmt = this;
