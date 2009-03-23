@@ -898,6 +898,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   commandPanel.setAttribute('style', 'position: absolute; right: 0px; top: 0px;');
   document.getElementsByTagName('div')[0].appendChild(commandPanel);
 
+  // n new tweets label
   var checkUpdateDiv = document.createElement('div');
   checkUpdateDiv.setAttribute('id', 'bmt-checkupdate');
   checkUpdateDiv.setAttribute('style', 'float:left; margin:3px 5px 0px 0px;');
@@ -928,6 +929,21 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
       }
     }, false);
     commandPanel.appendChild(clearTwitpic);
+  }
+
+  // switch to standard button
+  var changeuiform = document.evaluate("//html:form[@action='/sessions/change_ui']", document, this.nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  if (changeuiform) {
+    var changeUiButton = document.createElement('input');
+    changeUiButton.type = 'button';
+    changeUiButton.value = 'Standard';
+    changeUiButton.className = 'b';
+    changeUiButton.setAttribute('style', 'vertical-align:top; margin:3px 5px 0px 0px; font-size:10pt;');
+    changeUiButton.title = 'View Twitter in Standard version';
+    changeUiButton.addEventListener('click', function(e) {
+      changeuiform.submit();
+    }, false);
+    commandPanel.appendChild(changeUiButton);
   }
 
   // on off button
