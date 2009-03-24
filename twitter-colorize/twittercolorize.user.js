@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Twitter Colorize
 // @namespace      http://ellab.org/
-// @version        1
+// @version        2
 // @author         angusdev
 // @description    Assign color for different friends
 // @include        http://twitter.com/*
@@ -13,6 +13,7 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2009-03-19
 
 Version history:
+2                   Fine tune the color selection
 1    19-Mar-2009    First release to userscripts.org
 */
 
@@ -126,7 +127,7 @@ function onPaletteMouseClick(e, picker, color) {
 }
 
 function createColorPicker(e) {
-  var colorcode = 'fc9630';
+  var colorcode = 'fedca8';
   var picker = document.createElement('div');
   picker.setAttribute('id', 'twitter-colorize-colorpicker');
   picker.setAttribute('style', 'position:absolute; padding:10px;' +
