@@ -21,7 +21,7 @@ Version history:
                     @mentions and direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
                     ExpandUrl supports burnurl.com, snurl.com, bitly.com
-                    ExpandUrl image supports skitch.com
+                    ExpandUrl image supports skitch.com, phodroid.com
                     ExpandUrl matches url better for tinyurl
                     ExpandUrl fix the hellotxt image layout changed
                     Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
@@ -103,6 +103,7 @@ function BetterMobileTwitter() {
     {name:'pingfmimg',   func:this.expandUrl_pingfmimg,   ajax:true,  regex:/http:\/\/ping\.fm\/p\/[a-zA-z0-9]+$/},
     {name:'hellotxtimg', func:this.expandUrl_hellotxtimg, ajax:true,  regex:/http:\/\/hellotxt\.com\/i\/[a-zA-z0-9]+$/},
     {name:'skitch',      func:this.expandUrl_skitch,      ajax:true,  regex:/http:\/\/skitch\.com\//},
+    {name:'phodroid',    func:this.expandUrl_phodroid,    ajax:true,  regex:/http:\/\/phodroid\.com\//},
     {name:'youtube',     func:this.expandUrl_youtube,     ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
     {name:'img',         func:this.expandUrl_img,         ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/},
     {name:'googlelogin', func:this.expandUrl_googlelogin, ajax:false, regex:/^https?:\/\/[^\/]*\.google\.com?(\.[a-zA-Z]{1,2})?\/accounts\/ServiceLogin\?/},
@@ -625,6 +626,12 @@ BetterMobileTwitter.prototype.expandUrl_flickr = function(bmt, a, url, t) {
 BetterMobileTwitter.prototype.expandUrl_skitch = function(bmt, a, url, t) {
   bmt.sessionStorageWrapper_image(a, url, t, 'skitch', function() {
     return bmt.extract(t.responseText, "plasq.mySkitch.selectCopyContainer.addSelectCopy( 'Image only', '", "'");
+  });
+}
+
+BetterMobileTwitter.prototype.expandUrl_phodroid = function(bmt, a, url, t) {
+  bmt.sessionStorageWrapper_image(a, url, t, 'phodroid', function() {
+    return bmt.extract(t.responseText, 'div id="photo"><img src="', '"');
   });
 }
 
