@@ -10,10 +10,11 @@
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2009-03-19
+Date:   2009-03-24
 
 Version history:
-2                   Fine tune the color selection
+2    24-Mar-2009    Improve compatibility with other addons or user scripts
+                    Fine tune the color selection
 1    19-Mar-2009    First release to userscripts.org
 */
 
@@ -113,6 +114,10 @@ function onPaletteMouseClick(e, picker, color) {
   pickerTarget = pickerTarget?document.getElementById(pickerTarget):pickerTarget;
   if (pickerTarget) {
     var username = pickerTarget.className.match(/\su\-([a-zA-Z0-9_\-]+)$/);
+    if (!username) {
+      // for some addons or user scripts they may modify append other class name, so check for space after instead of eol
+      username = pickerTarget.className.match(/\su\-([a-zA-Z0-9_\-]+)\s+/);
+    }
     username = username?username[1]:username;
 
     if (username) {
