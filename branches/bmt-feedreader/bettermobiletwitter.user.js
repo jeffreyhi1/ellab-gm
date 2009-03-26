@@ -16,14 +16,15 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2009-03-17
 
 Version history:
-6    (beta)         Add @mentions sidebar
+6    (beta)         View other's tweets inline (no page refresh)
+                    Add @mentions sidebar
                     Show link of direct messages, @mentions, replies to can see full page
                     @mentions and direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
                     ExpandUrl supports burnurl.com, snurl.com, bitly.com
-                    ExpandUrl image supports skitch.com
+                    ExpandUrl image supports skitch.com, phodroid.com
                     ExpandUrl matches url better for tinyurl
-                    ExpandUrl fix the hellotxt image layout changed
+                    ExpandUrl fix the hellotxt and twitpic image layout changed
                     Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
                     @include more URLs instead of only http://m.twitter.com/home
 5    17-Mar-2009    Add direct messages sidebar
@@ -57,6 +58,7 @@ function BetterMobileTwitter() {
   this.isChrome = false;
   this.supportXSS = true;
   this.enabled = true;
+  this.enableScrollDetection = true;
   this.loading = false;
   this.page = 1;
   this.lastMessage = '';
@@ -104,6 +106,7 @@ function BetterMobileTwitter() {
     {name:'pingfmimg',   func:this.expandUrl_pingfmimg,   ajax:true,  regex:/http:\/\/ping\.fm\/p\/[a-zA-z0-9]+$/},
     {name:'hellotxtimg', func:this.expandUrl_hellotxtimg, ajax:true,  regex:/http:\/\/hellotxt\.com\/i\/[a-zA-z0-9]+$/},
     {name:'skitch',      func:this.expandUrl_skitch,      ajax:true,  regex:/http:\/\/skitch\.com\//},
+    {name:'phodroid',    func:this.expandUrl_phodroid,    ajax:true,  regex:/http:\/\/phodroid\.com\//},
     {name:'youtube',     func:this.expandUrl_youtube,     ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
     {name:'img',         func:this.expandUrl_img,         ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/},
     {name:'googlelogin', func:this.expandUrl_googlelogin, ajax:false, regex:/^https?:\/\/[^\/]*\.google\.com?(\.[a-zA-Z]{1,2})?\/accounts\/ServiceLogin\?/},
@@ -162,11 +165,11 @@ BetterMobileTwitter.prototype.removeInvalidChar = function(t) {
   return t;
 }
 
-BetterMobileTwitter.prototype.extractTweetsHTML = function(fullt) {
+BetterMobileTwitter.prototype.extractMobileTweetsHTML = function(fullt) {
   return this.removeInvalidChar(this.extract(fullt, '<ul>', '</ul>'));
 }
 
-BetterMobileTwitter.prototype.processTweetsHTML = function(fullt) {
+BetterMobileTwitter.prototype.processMobileTweetsHTML = function(fullt) {
   var bmt = this;
 
   var targetul = document.getElementById('bmt-tweetsdiv').getElementsByTagName('ul')[0];
@@ -186,10 +189,25 @@ BetterMobileTwitter.prototype.processTweetsHTML = function(fullt) {
     }
   }
 
-  var t = this.extractTweetsHTML(fullt);
+  var t = this.extractMobileTweetsHTML(fullt);
   var ulholder = document.createElement('ul');
   ulholder.innerHTML = t;
   var lilist = ulholder.getElementsByTagName('li');
+
+  // no need to enable scroll detection to load next page because no more tweets left
+  this.enableScrollDetection = lilist.length > 0;
+  if (lilist.length == 0 && this.page == 0) {
+    // first page no tweets, normally is protected
+
+    // get the message
+    var dummymsg = this.extract(fullt, '</div>', '<div');
+    if (dummymsg) {
+      var dummyli = document.createElement('li');
+      dummyli.innerHTML = dummymsg;
+      targetul.appendChild(dummyli);
+    }
+  }
+
   while (lilist.length) {
     lilist[0].addEventListener('mouseover', function(e) { bmt.onMouseOverOutTweets(e.target, true); }, false);
     lilist[0].addEventListener('mouseout', function(e) { bmt.onMouseOverOutTweets(e.target, false); }, false);
@@ -212,6 +230,8 @@ BetterMobileTwitter.prototype.processTweetsHTML = function(fullt) {
   this.onUserFilterChanged(filter);
 
   this.page++;
+
+  this.modifyUserLink();
   this.expandUrl(1);
 }
 
@@ -228,7 +248,7 @@ BetterMobileTwitter.prototype.nextPage = function() {
   client.onreadystatechange = function() {
     if (this.readyState == 4) {
       if (this.status == 200) {
-        bmt.processTweetsHTML(this.responseText);
+        bmt.processMobileTweetsHTML(this.responseText);
       }
       else {
         document.getElementById('bmt-scrolldetector').innerHTML = 'Error ' + this.status;
@@ -256,7 +276,7 @@ BetterMobileTwitter.prototype.loadReplies = function() {
       replyDiv.style.minHeight = '';
 
       if (this.status == 200) {
-        var t = bmt.extractTweetsHTML(this.responseText);
+        var t = bmt.extractMobileTweetsHTML(this.responseText);
         replyDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
                              '<a href="http://' + document.location.host + '/replies"><b>replies</b></a>' +
                              '</div><ul>' + t + '</ul>';
@@ -351,17 +371,16 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
   client.send(null);
 }
 
-BetterMobileTwitter.prototype.changeToViewUser = function(username) {
-  var bmt = this;
-
+BetterMobileTwitter.prototype.inlineViewUser = function(username) {
   document.getElementById('bmt-tweetsdiv').getElementsByTagName('ul')[0].innerHTML = '';
-  var youAndFriendsDiv = document.evaluate("//html:div[@class='s']", document, bmt.nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  var youAndFriendsDiv = document.evaluate("//html:div[@class='s']", document, this.nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   if (youAndFriendsDiv) {
-    youAndFriendsDiv.innerHTML = '<b>' + username + '</b>';
+    youAndFriendsDiv.innerHTML = '<a href="' + document.location.protocol + '//' + document.location.host + '/' + username + '"><b style="font-size:150%;">' + username + '</b></a>';
   }
-  bmt.viewingUsername = username;
-  bmt.page = 0;
-  bmt.nextPage();
+  this.viewingUsername = username;
+  this.page = 0;
+  scroll(0, 0);
+  this.nextPage();
 }
 
 BetterMobileTwitter.prototype.makeSubscribeListFromOptionsHTML = function(subscribeDiv, t) {
@@ -380,7 +399,7 @@ BetterMobileTwitter.prototype.makeSubscribeListFromOptionsHTML = function(subscr
     var sublinks = subscribeDiv.getElementsByTagName('a');
     for (var i=0;i<sublinks.length;i++) {
       sublinks[i].addEventListener('click', function(e) {
-        bmt.changeToViewUser(e.target.textContent);
+        bmt.inlineViewUser(e.target.textContent);
       }, false);
     }
   }
@@ -468,11 +487,13 @@ BetterMobileTwitter.prototype.calcOffsetTop = function(e) {
 }
 
 BetterMobileTwitter.prototype.detectScroll = function() {
-  if (!this.enabled) return;
+  if (!this.enabled || !this.enableScrollDetection) return;
   var scrollTop = this.isChrome?document.body.scrollTop:document.documentElement.scrollTop;
   if (this.calcOffsetTop(document.getElementById('bmt-scrolldetector')) < scrollTop + document.documentElement.clientHeight) {
     this.nextPage();
   }
+
+  bmt.expandUrl(1);
 }
 
 BetterMobileTwitter.prototype.statusMessageChanged = function(e) {
@@ -646,7 +667,7 @@ BetterMobileTwitter.prototype.expandUrl_burnurl = function(bmt, a, url, t) {
 
 BetterMobileTwitter.prototype.expandUrl_twitpic = function(bmt, a, url, t) {
   bmt.sessionStorageWrapper_image(a, url, t, 'twitpic', function() {
-    return bmt.extract(bmt.extract(t.responseText, '<img id="pic"'), 'src="', '"');
+    return bmt.extract(bmt.extract(t.responseText, '<div id="photo"'), 'src="', '"');
   });
 }
 
@@ -688,6 +709,12 @@ BetterMobileTwitter.prototype.expandUrl_flickr = function(bmt, a, url, t) {
 BetterMobileTwitter.prototype.expandUrl_skitch = function(bmt, a, url, t) {
   bmt.sessionStorageWrapper_image(a, url, t, 'skitch', function() {
     return bmt.extract(t.responseText, "plasq.mySkitch.selectCopyContainer.addSelectCopy( 'Image only', '", "'");
+  });
+}
+
+BetterMobileTwitter.prototype.expandUrl_phodroid = function(bmt, a, url, t) {
+  bmt.sessionStorageWrapper_image(a, url, t, 'phodroid', function() {
+    return bmt.extract(t.responseText, 'div id="photo"><img src="', '"');
   });
 }
 
@@ -811,7 +838,7 @@ BetterMobileTwitter.prototype.onMouseOverOutTweets = function(obj, isover) {
     if (actionspan.length > 0 && actionspan[actionspan.length - 1].getAttribute('bmt-actionspan')) {
       actionspan = actionspan[actionspan.length - 1];
     }
-    else if (isover && this.myname != obj.getElementsByTagName('a')[0].textContent) {
+    else if (isover && obj.getElementsByTagName('a').length && this.myname != obj.getElementsByTagName('a')[0].textContent) {
       actionspan = document.createElement('span');
       actionspan.setAttribute('bmt-actionspan', 'true');
       // tweets div is 80% width, so use right: 22%
@@ -845,6 +872,22 @@ BetterMobileTwitter.prototype.onMouseOverOutTweets = function(obj, isover) {
     }
 
     obj.style.backgroundColor = isover?'#f7f7f7':'';
+  }
+}
+
+// Modify user link to be inline view user function
+BetterMobileTwitter.prototype.modifyUserLink = function() {
+  var bmt = this;
+  var res = document.evaluate("//html:div[@id='bmt-tweetsdiv']//html:a[not(@bmt-processed-viewuser)]", document, this.nsResolver, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (var i=0;i<res.snapshotLength;i++) {
+    var a = res.snapshotItem(i);
+    if (a.href == (document.location.protocol + '//' + document.location.host + '/' + a.innerHTML)) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        bmt.inlineViewUser(e.target.textContent);
+      }, false);
+    }
+    a.setAttribute('bmt-processed-viewuser', true);
   }
 }
 
@@ -1063,6 +1106,9 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   htmlholder.setAttribute('id', 'bmt-htmlholder');
   htmlholder.style.display = 'none';
   document.body.appendChild(htmlholder);
+
+  // modify user link to enable inline viewing
+  this.modifyUserLink();
 
   // expand URL
   this.expandUrl(this.EXPANDURL_INIT_COUNT);
