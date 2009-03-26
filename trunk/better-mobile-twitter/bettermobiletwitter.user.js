@@ -24,7 +24,7 @@ Version history:
                     ExpandUrl supports burnurl.com, snurl.com, bitly.com
                     ExpandUrl image supports skitch.com, phodroid.com
                     ExpandUrl matches url better for tinyurl
-                    ExpandUrl fix the hellotxt image layout changed
+                    ExpandUrl fix the hellotxt and twitpic image layout changed
                     Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
                     @include more URLs instead of only http://m.twitter.com/home
 5    17-Mar-2009    Add direct messages sidebar
@@ -630,7 +630,7 @@ BetterMobileTwitter.prototype.expandUrl_burnurl = function(bmt, a, url, t) {
 
 BetterMobileTwitter.prototype.expandUrl_twitpic = function(bmt, a, url, t) {
   bmt.sessionStorageWrapper_image(a, url, t, 'twitpic', function() {
-    return bmt.extract(bmt.extract(t.responseText, '<img id="pic"'), 'src="', '"');
+    return bmt.extract(bmt.extract(t.responseText, '<div id="photo"'), 'src="', '"');
   });
 }
 
