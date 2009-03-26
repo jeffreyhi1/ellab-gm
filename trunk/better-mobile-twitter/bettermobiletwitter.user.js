@@ -465,8 +465,8 @@ BetterMobileTwitter.prototype.statusMessageChanged = function(e) {
 
 BetterMobileTwitter.prototype.checkUpdate = function() {
   var bmt = this;
-  if (!bmt.enabled) {
-    window.setTimeout(function() {bmt.checkUpdate(bmt);}, 60000);
+  if (!this.enabled) {
+    window.setTimeout(function() {this.checkUpdate();}, 60000);
     return;
   }
 
@@ -475,8 +475,7 @@ BetterMobileTwitter.prototype.checkUpdate = function() {
     if (this.readyState == 4) {
       if (this.status == 200) {
         var newTweetsCount = 0;
-        var fullt = this.responseText;
-        var t = bmt.extract(fullt, '<ul>', '</ul>');
+        var t = bmt.extractMobileTweetsHTML(this.responseText);
         while (t) {
           var li = bmt.extract(t, '<li>', '</li>');
           li = li?li.replace(/<small>[^<]*<\/small>/, ''):'';
@@ -967,6 +966,12 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
     tweetslilist.snapshotItem(i).addEventListener('mouseout', function(e) { bmt.onMouseOverOutTweets(e.target, false); }, false);
   }
 
+  // get last message
+  if (tweetslilist.snapshotLength > 0) {
+    this.lastMessage = tweetslilist.snapshotItem(0).innerHTML;
+    this.lastMessage = this.lastMessage.replace(/<small[^<]*<\/small>/, '');
+  }
+
   // change the older link for scroll detector
   var res = document.getElementsByTagName('a');
   for (var i=res.length-1; i>=0; i--) {
@@ -975,13 +980,6 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
       scrollDetector.setAttribute('id', 'bmt-scrolldetector');
       scrollDetector.innerHTML = '';
     }
-  }
-
-  // get last message
-  var lastMessageLi = document.getElementsByTagName('li');
-  if (lastMessageLi.length) {
-    this.lastMessage = lastMessageLi[0].innerHTML;
-    this.lastMessage = this.lastMessage.replace(/<small[^<]*<\/small>/, '');
   }
 
   // command panel
@@ -1059,7 +1057,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   // expand URL
   this.expandUrl(this.EXPANDURL_INIT_COUNT);
 
-  window.setInterval(function() {bmt.detectScroll(bmt);}, 500);
-  window.setTimeout(function() {bmt.checkUpdate(bmt);}, 60000);
+  window.setInterval(function() {bmt.detectScroll();}, 500);
+  window.setTimeout(function() {bmt.checkUpdate();}, 60000);
 }
 new BetterMobileTwitter().init();
