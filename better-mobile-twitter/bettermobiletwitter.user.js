@@ -846,8 +846,8 @@ BetterMobileTwitter.prototype.modifyUserLink = function() {
     var a = res.snapshotItem(i);
     if (a.href == (document.location.protocol + '//' + document.location.host + '/' + a.innerHTML)) {
       a.addEventListener('click', function(e) {
-        bmt.changeToViewUser(e.target.textContent);
         e.preventDefault();
+        bmt.inlineViewUser(e.target.textContent);
       }, false);
     }
     a.setAttribute('bmt-processed-viewuser', true);
