@@ -16,7 +16,8 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2009-03-17
 
 Version history:
-6    (beta)         Add @mentions sidebar
+6    (beta)         View other's tweets inline (no page refresh)
+                    Add @mentions sidebar
                     Show link of direct messages, @mentions, replies to can see full page
                     @mentions and direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
@@ -57,10 +58,12 @@ function BetterMobileTwitter() {
   this.isChrome = false;
   this.supportXSS = true;
   this.enabled = true;
+  this.enableScrollDetection = true;
   this.loading = false;
   this.page = 1;
   this.lastMessage = '';
   this.myname = '';
+  this.viewingUsername = '';
 
   this.DIRECT_MESSAGE_MAX_DISPLAY = 2;
   this.MENTIONS_MAX_DISPLAY = 2;
@@ -176,11 +179,35 @@ BetterMobileTwitter.prototype.processTweetsHTML = function(fullt) {
     pageli.innerHTML = 'Page ' + (this.page + 1);
     targetul.appendChild(pageli);
   }
+  else {
+    // if viewing user's page, need to specially extract first message
+    var t = this.extract(this.extract(fullt, '<td class="g">'), '</b> ', '<div');
+    if (t) {
+      var firstli = document.createElement('li');
+      firstli.innerHTML = t;
+      targetul.appendChild(firstli);
+    }
+  }
 
   var t = this.extractTweetsHTML(fullt);
   var ulholder = document.createElement('ul');
   ulholder.innerHTML = t;
   var lilist = ulholder.getElementsByTagName('li');
+
+  // no need to enable scroll detection to load next page because no more tweets left
+  this.enableScrollDetection = lilist.length > 0;
+  if (lilist.length == 0 && this.page == 0) {
+    // first page no tweets, normally is protected
+
+    // get the message
+    var dummymsg = this.extract(fullt, '</div>', '<div');
+    if (dummymsg) {
+      var dummyli = document.createElement('li');
+      dummyli.innerHTML = dummymsg;
+      targetul.appendChild(dummyli);
+    }
+  }
+
   while (lilist.length) {
     lilist[0].addEventListener('mouseover', function(e) { bmt.onMouseOverOutTweets(e.target, true); }, false);
     lilist[0].addEventListener('mouseout', function(e) { bmt.onMouseOverOutTweets(e.target, false); }, false);
@@ -203,6 +230,8 @@ BetterMobileTwitter.prototype.processTweetsHTML = function(fullt) {
   this.onUserFilterChanged(filter);
 
   this.page++;
+
+  this.modifyUserLink();
   this.expandUrl(1);
 }
 
@@ -226,7 +255,12 @@ BetterMobileTwitter.prototype.nextPage = function() {
       }
     }
   }
-  client.open('GET', document.location.protocol + '//' + document.location.host + '/account/home.mobile?page=' + (bmt.page + 1));
+  if (this.viewingUsername) {
+    client.open('GET', document.location.protocol + '//' + document.location.host + '/account/profile.mobile?user=' + this.viewingUsername + '&page=' + (this.page + 1));
+  }
+  else {
+    client.open('GET', document.location.protocol + '//' + document.location.host + '/account/home.mobile?page=' + (this.page + 1));
+  }
   client.send(null);
 }
 
@@ -324,6 +358,20 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
   client.send(null);
 }
 
+BetterMobileTwitter.prototype.changeToViewUser = function(username) {
+  var bmt = this;
+
+  document.getElementById('bmt-tweetsdiv').getElementsByTagName('ul')[0].innerHTML = '';
+  var youAndFriendsDiv = document.evaluate("//html:div[@class='s']", document, bmt.nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  if (youAndFriendsDiv) {
+    youAndFriendsDiv.innerHTML = '<a href="' + document.location.protocol + '//' + document.location.host + '/' + username + '"><b style="font-size:150%;">' + username + '</b></a>';
+  }
+  bmt.viewingUsername = username;
+  bmt.page = 0;
+  scroll(0, 0);
+  bmt.nextPage();
+}
+
 BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
   var mentionDiv = document.getElementById('bmt-mentiondiv');
   mentionDiv.innerHTML = 'Loading @mentions ...';
@@ -406,7 +454,7 @@ BetterMobileTwitter.prototype.calcOffsetTop = function(e) {
 }
 
 BetterMobileTwitter.prototype.detectScroll = function() {
-  if (!this.enabled) return;
+  if (!this.enabled || !this.enableScrollDetection) return;
   var scrollTop = this.isChrome?document.body.scrollTop:document.documentElement.scrollTop;
   if (this.calcOffsetTop(document.getElementById('bmt-scrolldetector')) < scrollTop + document.documentElement.clientHeight) {
     this.nextPage();
@@ -755,7 +803,7 @@ BetterMobileTwitter.prototype.onMouseOverOutTweets = function(obj, isover) {
     if (actionspan.length > 0 && actionspan[actionspan.length - 1].getAttribute('bmt-actionspan')) {
       actionspan = actionspan[actionspan.length - 1];
     }
-    else if (isover && this.myname != obj.getElementsByTagName('a')[0].textContent) {
+    else if (isover && obj.getElementsByTagName('a').length && this.myname != obj.getElementsByTagName('a')[0].textContent) {
       actionspan = document.createElement('span');
       actionspan.setAttribute('bmt-actionspan', 'true');
       // tweets div is 80% width, so use right: 22%
@@ -792,6 +840,22 @@ BetterMobileTwitter.prototype.onMouseOverOutTweets = function(obj, isover) {
   }
 }
 
+// Modify user link to be inline view user function
+BetterMobileTwitter.prototype.modifyUserLink = function() {
+  var bmt = this;
+  var res = document.evaluate("//html:div[@id='bmt-tweetsdiv']//html:a[not(@bmt-processed-viewuser)]", document, this.nsResolver, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (var i=0;i<res.snapshotLength;i++) {
+    var a = res.snapshotItem(i);
+    if (a.href == (document.location.protocol + '//' + document.location.host + '/' + a.innerHTML)) {
+      a.addEventListener('click', function(e) {
+        bmt.changeToViewUser(e.target.textContent);
+        e.preventDefault();
+      }, false);
+    }
+    a.setAttribute('bmt-processed-viewuser', true);
+  }
+}
+
 BetterMobileTwitter.prototype.functionPrinciple = function() {
   // check if it is a mobile version
   if (document.getElementById('dim-screen')) return;
@@ -822,7 +886,6 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
 
   tweetsDiv.setAttribute('style', 'width:80%;');
   tweetsDiv.setAttribute('id', 'bmt-tweetsdiv');
-
 
   rightBarDiv.setAttribute('style', 'float:right; width:19%; margin-left:1%; margin-right:3px; ');
 
@@ -991,6 +1054,9 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   htmlholder.setAttribute('id', 'bmt-htmlholder');
   htmlholder.style.display = 'none';
   document.body.appendChild(htmlholder);
+
+  // modify user link to enable inline viewing
+  this.modifyUserLink();
 
   // expand URL
   this.expandUrl(this.EXPANDURL_INIT_COUNT);
