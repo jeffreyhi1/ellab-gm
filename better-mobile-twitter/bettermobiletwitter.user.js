@@ -165,11 +165,11 @@ BetterMobileTwitter.prototype.removeInvalidChar = function(t) {
   return t;
 }
 
-BetterMobileTwitter.prototype.extractTweetsHTML = function(fullt) {
+BetterMobileTwitter.prototype.extractMobileTweetsHTML = function(fullt) {
   return this.removeInvalidChar(this.extract(fullt, '<ul>', '</ul>'));
 }
 
-BetterMobileTwitter.prototype.processTweetsHTML = function(fullt) {
+BetterMobileTwitter.prototype.processMobileTweetsHTML = function(fullt) {
   var bmt = this;
 
   var targetul = document.getElementById('bmt-tweetsdiv').getElementsByTagName('ul')[0];
@@ -189,7 +189,7 @@ BetterMobileTwitter.prototype.processTweetsHTML = function(fullt) {
     }
   }
 
-  var t = this.extractTweetsHTML(fullt);
+  var t = this.extractMobileTweetsHTML(fullt);
   var ulholder = document.createElement('ul');
   ulholder.innerHTML = t;
   var lilist = ulholder.getElementsByTagName('li');
@@ -248,7 +248,7 @@ BetterMobileTwitter.prototype.nextPage = function() {
   client.onreadystatechange = function() {
     if (this.readyState == 4) {
       if (this.status == 200) {
-        bmt.processTweetsHTML(this.responseText);
+        bmt.processMobileTweetsHTML(this.responseText);
       }
       else {
         document.getElementById('bmt-scrolldetector').innerHTML = 'Error ' + this.status;
@@ -276,7 +276,7 @@ BetterMobileTwitter.prototype.loadReplies = function() {
       replyDiv.style.minHeight = '';
 
       if (this.status == 200) {
-        var t = bmt.extractTweetsHTML(this.responseText);
+        var t = bmt.extractMobileTweetsHTML(this.responseText);
         replyDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
                              '<a href="http://' + document.location.host + '/replies"><b>replies</b></a>' +
                              '</div><ul>' + t + '</ul>';
@@ -358,18 +358,16 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
   client.send(null);
 }
 
-BetterMobileTwitter.prototype.changeToViewUser = function(username) {
-  var bmt = this;
-
+BetterMobileTwitter.prototype.inlineViewUser = function(username) {
   document.getElementById('bmt-tweetsdiv').getElementsByTagName('ul')[0].innerHTML = '';
-  var youAndFriendsDiv = document.evaluate("//html:div[@class='s']", document, bmt.nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  var youAndFriendsDiv = document.evaluate("//html:div[@class='s']", document, this.nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   if (youAndFriendsDiv) {
     youAndFriendsDiv.innerHTML = '<a href="' + document.location.protocol + '//' + document.location.host + '/' + username + '"><b style="font-size:150%;">' + username + '</b></a>';
   }
-  bmt.viewingUsername = username;
-  bmt.page = 0;
+  this.viewingUsername = username;
+  this.page = 0;
   scroll(0, 0);
-  bmt.nextPage();
+  this.nextPage();
 }
 
 BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
