@@ -399,6 +399,7 @@ BetterMobileTwitter.prototype.makeSubscribeListFromOptionsHTML = function(subscr
     var sublinks = subscribeDiv.getElementsByTagName('a');
     for (var i=0;i<sublinks.length;i++) {
       sublinks[i].addEventListener('click', function(e) {
+        e.preventDefault();
         bmt.inlineViewUser(e.target.textContent);
       }, false);
     }
