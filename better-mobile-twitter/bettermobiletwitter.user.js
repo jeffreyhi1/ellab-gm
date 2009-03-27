@@ -65,6 +65,8 @@ function BetterMobileTwitter() {
   this.myname = '';
   this.viewingUsername = '';
 
+  this.CHECK_UPDATE_INTERVAL = 60000;   // millisecond
+  this.DETECT_SCROLL_INTERVAL = 500;    // millisecond
   this.DIRECT_MESSAGE_MAX_DISPLAY = 2;
   this.MENTIONS_MAX_DISPLAY = 2;
   this.MENTIONS_MAX_PAGE = 3;
@@ -466,7 +468,7 @@ BetterMobileTwitter.prototype.statusMessageChanged = function(e) {
 BetterMobileTwitter.prototype.checkUpdate = function() {
   var bmt = this;
   if (!this.enabled) {
-    window.setTimeout(function() {this.checkUpdate();}, 60000);
+    window.setTimeout(function() {bmt.checkUpdate();}, this.CHECK_UPDATE_INTERVAL);
     return;
   }
 
@@ -506,7 +508,7 @@ BetterMobileTwitter.prototype.checkUpdate = function() {
         document.getElementById('bmt-checkupdate').innerHTML = 'Error ' + this.status;
       }
 
-      window.setTimeout(function() {bmt.checkUpdate(bmt);}, 60000);
+      window.setTimeout(function() {bmt.checkUpdate();}, bmt.CHECK_UPDATE_INTERVAL);
     }
   }
   client.open('GET', document.location.protocol + '//' + document.location.host + '/account/home.mobile');
@@ -1057,7 +1059,7 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   // expand URL
   this.expandUrl(this.EXPANDURL_INIT_COUNT);
 
-  window.setInterval(function() {bmt.detectScroll();}, 500);
-  window.setTimeout(function() {bmt.checkUpdate();}, 60000);
+  window.setInterval(function() {bmt.detectScroll();}, this.DETECT_SCROLL_INTERVAL);
+  window.setTimeout(function() {bmt.checkUpdate();}, this.CHECK_UPDATE_INTERVAL);
 }
 new BetterMobileTwitter().init();
