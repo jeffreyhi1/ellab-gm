@@ -688,9 +688,11 @@ BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
     a.innerHTML = a.innerHTML.replace(/([\?|&]v=[a-zA-Z0-9_\-]*)(&.*$)/, '$1&amp;...');
 
     bmt.expandUrl_image(a, url, 'http://i4.ytimg.com/vi/' + res[1] + '/default.jpg');
+    bmt.expandUrl(1);
   }
-
-  bmt.expandUrl_longurl(bmt, a, url);
+  else {
+    bmt.expandUrl_longurl(bmt, a, url);
+  }
 }
 
 BetterMobileTwitter.prototype.expandUrl_img = function(bmt, a, url) {
