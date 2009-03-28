@@ -688,7 +688,6 @@ BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
     a.innerHTML = a.innerHTML.replace(/([\?|&]v=[a-zA-Z0-9_\-]*)(&.*$)/, '$1&amp;...');
 
     bmt.expandUrl_image(a, url, 'http://i4.ytimg.com/vi/' + res[1] + '/default.jpg');
-    bmt.expandUrl(1);
   }
   else {
     bmt.expandUrl_longurl(bmt, a, url);
@@ -710,15 +709,17 @@ BetterMobileTwitter.prototype.expandUrl_googlelogin = function(bmt, a, url) {
 
 BetterMobileTwitter.prototype.expandUrl_longurl = function(bmt, a, url) {
   var MAX_LENGTH = 70;
-  var brokenurl = '';
   var html = a.innerHTML;
-  while (html.length > MAX_LENGTH) {
+  if (html.length > MAX_LENGTH) {
+    var brokenurl = '';
+    while (html.length > MAX_LENGTH) {
+      brokenurl = brokenurl + (brokenurl.length?' ':'') + html.substring(0, MAX_LENGTH);
+      html = html.substring(MAX_LENGTH);
+    }
     brokenurl = brokenurl + (brokenurl.length?' ':'') + html.substring(0, MAX_LENGTH);
-    html = html.substring(MAX_LENGTH);
-  }
-  brokenurl = brokenurl + (brokenurl.length?' ':'') + html.substring(0, MAX_LENGTH);
 
-  a.innerHTML = bmt.encodeHTML(brokenurl);
+    a.innerHTML = bmt.encodeHTML(brokenurl);
+  }
 
   bmt.expandUrl(1);
 }
