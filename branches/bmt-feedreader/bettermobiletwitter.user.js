@@ -112,7 +112,7 @@ function BetterMobileTwitter() {
     {name:'youtube',     func:this.expandUrl_youtube,     ajax:false, regex:/http:\/\/[a-z]*\.youtube\.com\//},
     {name:'img',         func:this.expandUrl_img,         ajax:false, regex:/http:\/\/.*\.(gif|jpg|png)$/},
     {name:'googlelogin', func:this.expandUrl_googlelogin, ajax:false, regex:/^https?:\/\/[^\/]*\.google\.com?(\.[a-zA-Z]{1,2})?\/accounts\/ServiceLogin\?/},
-    {name:'longurl',     func:this.expandUrl_longurl,     ajax:false, regex:/.{101}/},
+    {name:'longurl',     func:this.expandUrl_longurl,     ajax:false, regex:/.{71}/},
   ];
 }
 
@@ -491,8 +491,6 @@ BetterMobileTwitter.prototype.detectScroll = function() {
   if (this.calcOffsetTop(document.getElementById('bmt-scrolldetector')) < scrollTop + document.documentElement.clientHeight) {
     this.nextPage();
   }
-
-  bmt.expandUrl(1);
 }
 
 BetterMobileTwitter.prototype.statusMessageChanged = function(e) {
@@ -665,7 +663,7 @@ BetterMobileTwitter.prototype.expandUrl_burnurl = function(bmt, a, url, t) {
 
 BetterMobileTwitter.prototype.expandUrl_twitpic = function(bmt, a, url, t) {
   bmt.sessionStorageWrapper_image(a, url, t, 'twitpic', function() {
-    return bmt.extract(bmt.extract(t.responseText, '<div id="photo"'), 'src="', '"');
+    return bmt.extract(bmt.extract(t.responseText, '<div id="photo"'), '<img class="photo-large" src="', '"');
   });
 }
 
@@ -724,7 +722,7 @@ BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
     bmt.expandUrl_image(a, url, 'http://i4.ytimg.com/vi/' + res[1] + '/default.jpg');
   }
   else {
-    bmt.expandUrl(1);
+    bmt.expandUrl_longurl(bmt, a, url);
   }
 }
 
@@ -742,15 +740,18 @@ BetterMobileTwitter.prototype.expandUrl_googlelogin = function(bmt, a, url) {
 }
 
 BetterMobileTwitter.prototype.expandUrl_longurl = function(bmt, a, url) {
-  var brokenurl = '';
+  var MAX_LENGTH = 70;
   var html = a.innerHTML;
-  while (html.length > 100) {
-    brokenurl = brokenurl + (brokenurl.length?' ':'') + html.substring(0, 100);
-    html = html.substring(100);
-  }
-  brokenurl = brokenurl + (brokenurl.length?' ':'') + html.substring(0, 100);
+  if (html.length > MAX_LENGTH) {
+    var brokenurl = '';
+    while (html.length > MAX_LENGTH) {
+      brokenurl = brokenurl + (brokenurl.length?' ':'') + html.substring(0, MAX_LENGTH);
+      html = html.substring(MAX_LENGTH);
+    }
+    brokenurl = brokenurl + (brokenurl.length?' ':'') + html.substring(0, MAX_LENGTH);
 
-  a.innerHTML = bmt.encodeHTML(brokenurl);
+    a.innerHTML = bmt.encodeHTML(brokenurl);
+  }
 
   bmt.expandUrl(1);
 }
