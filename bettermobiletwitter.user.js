@@ -64,6 +64,7 @@ function BetterMobileTwitter() {
   this.lastMessage = '';
   this.myname = '';
   this.viewingUsername = '';
+  this.friendList;
 
   this.CHECK_UPDATE_INTERVAL = 60000;   // millisecond
   this.DETECT_SCROLL_INTERVAL = 500;    // millisecond
@@ -396,7 +397,18 @@ BetterMobileTwitter.prototype.inlineViewUser = function(username) {
   document.getElementById('bmt-tweetsdiv').getElementsByTagName('ul')[0].innerHTML = '';
   var youAndFriendsDiv = document.evaluate("//html:div[@class='s']", document, this.nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   if (youAndFriendsDiv) {
-    youAndFriendsDiv.innerHTML = '<a href="' + document.location.protocol + '//' + document.location.host + '/' + username + '"><b style="font-size:150%;">' + username + '</b></a>';
+    // find profile image
+    var profileImage = '';
+    for (var i=0;i<this.friendList.length;i++) {
+      if (this.friendList[i].screen_name == username) {
+        profileImage = this.friendList[i].profile_image_url;
+      }
+    }
+    var html = '<span style="vertical-align:top"><a href="' + document.location.protocol + '//' + document.location.host + '/' + username + '"><b style="font-size:150%;">' + username + '</b></a></span>';
+    if (profileImage) {
+      html = '<img src="' + profileImage + '"/> ' + html;
+    }
+    youAndFriendsDiv.innerHTML = html;
   }
   this.viewingUsername = username;
   this.page = 0;
@@ -899,20 +911,17 @@ BetterMobileTwitter.prototype.constructSubList = function() {
 
   var friends = GM_getValue('friendlist');
   if (friends) {
-    friends = this.parseJSON(friends);
-    friends = friends.sort(function(a, b) {
-      return a.screen_name.toLowerCase() > b.screen_name.toLowerCase()?1:-1;
-    });
+    this.friendList = this.parseJSON(friends);
   }
   else {
-    friends = new Array();
+    this.friendList = new Array();
   }
 
   var subscribeDiv = document.getElementById('bmt-subscribediv');
   subscribeDiv.style.minHeight = '';
 
-  for (var i=0;i<friends.length;i++) {
-    html = html + '<li><a href="#" bmt-viewuser="' + friends[i].screen_name + '">' + friends[i].screen_name + '</a> (' + friends[i].name + ')</li>';
+  for (var i=0;i<this.friendList.length;i++) {
+    html = html + '<li><a href="#" bmt-viewuser="' + this.friendList[i].screen_name + '">' + this.friendList[i].screen_name + '</a> (' + this.friendList[i].name + ')</li>';
   }
   subscribeDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>subscriptions</b></div>'+
                            '<ul>' + html + '</ul>';
@@ -956,6 +965,9 @@ BetterMobileTwitter.prototype.loadFriends = function(page, friends, subscribeDiv
           bmt.loadFriends(page + 1, friends, subscribeDiv, func);
         }
         else {
+          friends = friends.sort(function(a, b) {
+            return a.screen_name.toLowerCase() > b.screen_name.toLowerCase()?1:-1;
+          });
           if (GM_setValue) {
             GM_setValue('friendlist', bmt.stringifyJSON(friends));
           }
