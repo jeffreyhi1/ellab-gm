@@ -898,14 +898,15 @@ BetterMobileTwitter.prototype.constructSubList = function() {
   html = '<li><span style="font-size:133%;font-weight:bold;">friends:</span> (<a id="bmt-reloadfriend" href="#" style="position:relative;">reload</a>)</li>';
 
   var friends = GM_getValue('friendlist');
-  if (!friends) {
-    return;
+  if (friends) {
+    friends = this.parseJSON(friends);
+    friends = friends.sort(function(a, b) {
+      return a.screen_name.toLowerCase() > b.screen_name.toLowerCase()?1:-1;
+    });
   }
-
-  friends = eval(friends);
-  friends = friends.sort(function(a, b) {
-    return a.screen_name.toLowerCase() > b.screen_name.toLowerCase()?1:-1;
-  });
+  else {
+    friends = new Array();
+  }
 
   var subscribeDiv = document.getElementById('bmt-subscribediv');
   subscribeDiv.style.minHeight = '';
@@ -951,15 +952,15 @@ BetterMobileTwitter.prototype.loadFriends = function(page, friends, subscribeDiv
             profile_image_url:pagefriend[i].profile_image_url
           });
         }
-        if (pagefriend.length >= 100) {
-          bmt.loadFriends(page+1, friends, subscribeDiv, func);
+        if (page < 5 && pagefriend.length >= 100) {
+          bmt.loadFriends(page + 1, friends, subscribeDiv, func);
         }
         else {
           if (GM_setValue) {
             GM_setValue('friendlist', bmt.stringifyJSON(friends));
           }
           if (func) {
-            func();
+            func.call(bmt);
           }
         }
       }
@@ -1035,7 +1036,6 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
                                      'background:#e5e5ff; border:1px solid #87bc44; ' +
                                      '-moz-border-radius:5px; -webkit-border-radius: 5px;');
   subscribeDiv.setAttribute('id', 'bmt-subscribediv');
-  subscribeDiv.innerHTML = 'Loading subscription ...';
   leftBarDiv.appendChild(subscribeDiv);
 
   tweetsUl.parentNode.insertBefore(leftBarDiv, tweetsUl);
@@ -1046,12 +1046,6 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   this.loadDirectMessage(this.DIRECT_MESSAGE_MAX_DISPLAY);
   if (this.supportXSS) {
     this.loadMentions(this.MENTIONS_MAX_DISPLAY);
-    //if (window.sessionStorage) {
-    //  var html = window.sessionStorage.getItem('directmessageoptionshtml');
-    //  if (html) {
-    //    this.makeSubscribeListFromOptionsHTML(subscribeDiv, html.value);
-    //  }
-    //}
   }
   this.loadReplies();
   if (GM_getValue) {
