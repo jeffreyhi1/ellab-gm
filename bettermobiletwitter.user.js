@@ -905,10 +905,6 @@ BetterMobileTwitter.prototype.modifyUserLink = function() {
 BetterMobileTwitter.prototype.constructSubList = function() {
   var bmt = this;
 
-  var html = '';
-
-  html = '<li><span style="font-size:133%;font-weight:bold;">friends:</span> (<a id="bmt-reloadfriend" href="#" style="position:relative;">reload</a>)</li>';
-
   var friends = GM_getValue('friendlist');
   if (friends) {
     this.friendList = this.parseJSON(friends);
@@ -920,6 +916,10 @@ BetterMobileTwitter.prototype.constructSubList = function() {
   var subscribeDiv = document.getElementById('bmt-subscribediv');
   subscribeDiv.style.minHeight = '';
 
+  var html = '';
+  html = '<li><span style="font-size:133%;font-weight:bold;">friends' +
+         (this.friendList.length>0?' (' + this.friendList.length + ')':'') +
+         ':</span> (<a id="bmt-reloadfriend" href="#" style="position:relative;">reload</a>)</li>';
   for (var i=0;i<this.friendList.length;i++) {
     html = html + '<li><a href="#" bmt-viewuser="' + this.friendList[i].screen_name + '">' + this.friendList[i].screen_name + '</a> (' + this.friendList[i].name + ')</li>';
   }
