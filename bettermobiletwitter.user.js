@@ -406,7 +406,7 @@ BetterMobileTwitter.prototype.inlineViewUser = function(username) {
     }
     var html = '<span style="vertical-align:top"><a href="' + document.location.protocol + '//' + document.location.host + '/' + username + '"><b style="font-size:150%;">' + username + '</b></a></span>';
     if (profileImage) {
-      html = '<img src="' + profileImage + '"/> ' + html;
+      html = '<img alt="' + username + '" height="48" src="' + profileImage + '"/> ' + html;
     }
     youAndFriendsDiv.innerHTML = html;
   }
