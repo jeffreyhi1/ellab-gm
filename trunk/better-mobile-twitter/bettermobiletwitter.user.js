@@ -513,12 +513,14 @@ BetterMobileTwitter.prototype.expandUrl_tinyurl = function(bmt, a, url, t) {
     return t.finalUrl;
   });
 
+  a.setAttribute('bmt-finalurl', finalUrl);
   if (finalUrl && url != finalUrl) {
     a.innerHTML = bmt.encodeHTML(decodeURIComponent(finalUrl));
+    if (!bmt.expandOneUrl(a)) {
+      bmt.expandUrl(1);
+    }
   }
-  a.setAttribute('bmt-finalurl', finalUrl);
-
-  if (!bmt.expandOneUrl(a)) {
+  else {
     bmt.expandUrl(1);
   }
 }
