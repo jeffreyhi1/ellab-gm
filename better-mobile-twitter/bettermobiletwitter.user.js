@@ -406,6 +406,8 @@ BetterMobileTwitter.prototype.loadMentionsPage = function(mentionDiv, displayCou
           t = t.replace(/\s+onclick="[^"]*"/g, '');
           // change the search topic link
           t = t.replace(/<a href="\/search\?([^"]*)/g, '<a href="http://search.twitter.com/search?$1');
+          // remove the expand link. e.g. (<a class="lit" ...>expand</a><img .../>)
+          t = t.replace(/\(<a class="lit"[^>]*>.*[^>]*>.*[^>]*>\)/g, '');
           // finally remove invalid chars
           t = bmt.removeInvalidChar(t);
 
