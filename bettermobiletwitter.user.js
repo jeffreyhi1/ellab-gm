@@ -69,6 +69,8 @@ function BetterMobileTwitter() {
   this.rightBarDiv = null;
   this.directDiv = null;
   this.replyDiv = null;
+  this.leftBarDiv = null;
+  this.subscribeDiv = null;
 
   this.CHECK_UPDATE_INTERVAL = 60000;   // millisecond
   this.DETECT_SCROLL_INTERVAL = 500;    // millisecond
@@ -78,7 +80,9 @@ function BetterMobileTwitter() {
   this.RIGHT_BAR_BOX_CSS = 'min-height: 100px; padding:5px; font-size: 75%; ' +
                            'background:#f9ffe8; border:1px solid #87bc44; ' +
                            '-moz-border-radius:5px; -webkit-border-radius: 5px;';
-
+  this.SUBSCRIBE_CSS =     'min-height: 300px; padding:5px; font-size: 75%; ' +
+                           'background:#e5e5ff; border:1px solid #87bc44; ' +
+                           '-moz-border-radius:5px; -webkit-border-radius: 5px;';
   this.onsrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAcCAMAAACppkqwAAAACXBIWXMAAAsTAAALEwEAmpwYAAADAFBMVEUoKCgwMDA5OTkZOXogP3xAQEBERUhHSUtOUVVVVVVUWF5YWFhOWnBXY3plZWZiZGhsbGxvc3p0dHR9fX0YP4seRI8bQpEeT64lQ4AnRYErSIMkSJIoTJQsT5YyToUzUIg4VIoyVJo6Wpc6W50rU6AjVLcoWbguXLsxWKMwXLI1YLYxYL44ZL0iWsYmXMotYMQsYcw5Z8I6acY0aNA5bdNCV4BVbJlCYqJAY6pMba5BaLRMcLdQbahAbcVDcc1JdMpBc9dKeddJetxTfM1af8ltgqx0h618jrFXgM9bhtxSgeBYh+NciuRfjedjh9BpjNJvkdZzldd5mtxxluFzmud6nueCg4OXl5mam5yRoL+lpaWqrK63t7e/v7+DpOiFp+yKq+yRr+ufuOqirsiptcyvus+a5Oi7zfDGxsbOzs7Hz9/V1dXf39/M1OTO2vLW3OjV3/Td4uvd5PXn5+fg5Ozk6O/v7+/s8Pft8vz39/fz9Pj4+vz7/P39/f0S8OgABAGVYIgS8PxFZh4MAAAS8PhCkIMS8SQAAAD//EgAAAAWbsAWbuAABQAWbdAAAABCkAk94RQCCYoS8bAAAAAWbdA94R8AAAAAAAAABQAAABOVYIgABAEAAAAFhqAQacBFZcBBlL5Cr0ICCYoABAEAAAAFhqAAAAAAArAAAAEAAAAAAAAAAAAAAACKACEABQBC9AuVYIgABAEAAAAAAAQAAaYAAAIABQAAABMWbuABGOQAAAAAAAAAAAAAAAAAAAAAAAAAAAC/YRwABABPLyCACxKA7mRPL0QS8XBPMpQAxCgS8oA9654WbdAAAAAWbmAAAAQAAAAS8ug95RsAAAAAAAABGlIAAADxn43xntwBGlIAAAAAAAAS9SAAAAAAACg95RsAAAAS8ogA//8AAADxn3g95RsAAAAS8pRBhzQCCYoABAoAAAAS9sQS8qxBhzQCCYoAAA8AAAAAAAA95Ru6q80AAAAS8ug95RsS8xRBiBb90AAS8xRBiFoS8tQoKCgoKCj4nXKPAAAAZ3RSTlP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AFBa6eAAAAdZJREFUeNq91ulT00AYx/Eg1OLBGkHRUSbQcoyl5TKKogIppUjTDAq0HAU6CLgUSimXxPD753madwkduksYvi+y2+kz+5n0mInCOV9VQ5I9amp6whqnFjhXeLn1c9+QXG9etbC1rVLDNlWVgFBkWLL+zuYXhcbH1+ooKC+1Udn6XzczsfNLW6ryeEQaGCDgQDCmhKTPlwV06Qbet7CyYHcC4nLApxvp8Vhcdze67l5978e7ggExbTw9rsVo1619oGtEG/MOJAg4EowAw1dizgZw9XPQMBzsfjSMQyz4JrreBgHSwH5xH5irAfhhGBU/MBYImLKRpyWHqykCnMMEAb+8I5ORd+xcMAJmvKVgu6uN+RkHO0gnCfCOBAMWUXXXKpYIMO2Lb3WBS8EIML0t41+SluQFlkwC/mC9gt/ekeleLQCQASZomQCsGmCeOadYvE/APMHf6NfoHs5MFyjSb7YO4AhGQNZXDqjuVYB8NuuAXh8T4J1I9XbLAJa/7dof7f827ehjsqw8UPQOpL70MAhWD7CsXDFn3VJwoEHzDwEE+Q7uGQjLAykpYPX5ne7gXOz80orCw6HZjByQ+R5tWxERLg9YWeF842lY+slReSbw5MhYe5lfA3x4QqsW145cAAAAAElFTkSuQmCC';
   this.offsrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAcCAMAAACppkqwAAAACXBIWXMAAAsTAAALEwEAmpwYAAADAFBMVEU/Pz9AQEBCQkJDQ0NKSkpMTExNTU1OTk5QUFBRUVFSUlJUVFRVVVVYWFhZWVlbW1tcXFxdXV1eXl5fX19iYmJjY2NlZWVmZmZnZ2doaGhpaWlqamptbW10dHR1dXV2dnZ3d3d8fHx9fX1/f3+AgICBgYGCgoKDg4OFhYWGhoaHh4eIiIiJiYmKioqLi4uOjo6Pj4+QkJCSkpKUlJSVlZWWlpaYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6epqamqqqqrq6utra2urq6wsLC1tbW3t7e4uLi5ubm7u7u8vLy9vb2+vr6a5OjAwMDBwcHCwsLDw8PExMTGxsbHx8fIyMjJycnKysrMzMzPz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbY2Nja2trb29vc3Nze3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///8AAABCkAk94RQCCYoS8bAAAAAWbdA94R8AAAAAAAAABQAAABOVYIgABAEAAAAGH6QQacBFZcBBlL5Cr0ICCYoABAEAAAAGH6QAAAAAArAAAAEAAAAAAAAAAAAAAACKACEABQBC9AuVYIgABAEAAAAAAAQAAaYAAAIABQAAABMWbuABGOQAAAAAAAAAAAAAAAAAAAAAAAAAAAC/YRwABABPLyCACxKA7mRPL0QS8XBPMpQAxCgS8oA9654WbdAAAAAWbmAAAAQAAAAS8ug95RsAAAAAAAABGoQAAADxn43xntwBGoQAAAAAAAAS9SAAAAAAACg95RsAAAAS8ogA//8AAADxn3g95RsAAAAS8pRBhzQCCYoABAoAAAAS9sQS8qxBhzQCCYoAAA8AAAAAAAA95Ru6q80AAAAS8ug95RsS8xRBiBb90AAS8xRBiFoS8tQ/Pz8/Pz8VWo7vAAAAVXRSTlP///////////////////////////////////////////////////////////////////////////////////////////////////////////////8AsKEHzwAAAVhJREFUeNrt1i1vhTAUBmBOgsDgjkEgSOqqMEhkDUkVdZi6qsrKSn73TuHeDUIW2m5M7TUHGugT+kFazJphROqmY4nhwszzXCzNqO4jkCmbGCPZRABOEf0rNTWDcamxvSRgiQtmACSYBMCmA06JAnVc8gDLHwYc+wPAxIUAf4zTkzTbxb4o3auen/LZgEagMGpjsIWrvVYXIHLbnAFbAY59BW0Amp4iFZShjvmAO7zHgYXRqUASMGxNCmp/TS6AoHZnIIDTNtEBCPvFXYDI5XAGStgmeKQP4dvQl/41B+p3gBp0KANwAjD8Ogkowz/UXAAfFxzd+pUWxLvQMG1NNETrNbmAgJpulwLMQwDNcsU6gH79BJbvgDUuOPrjrW3DjA7+MWBdnTb+/rUfAHH5B+5ih4RlmgNIWTRPAprNRSdcRPeOoUgGnGR08JpjDo6ITd0mnx17QUfHDw3CUdHJl2jOAAAAAElFTkSuQmCC';
   this.loadingsrc = 'data:image/gif;base64,R0lGODlhEAAQAMQAAP///+7u7t3d3bu7u6qqqpmZmYiIiHd3d2ZmZlVVVURERDMzMyIiIhEREQARAAAAAP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFBwAQACwAAAAAEAAQAAAFdyAkQgGJJOWoQgIjBM8jkKsoPEzgyMGsCjPDw7ADpkQBxRDmSCRetpRA6Rj4kFBkgLC4IlUGhbNQIwXOYYWCXDufzYPDMaoKGBoKb886OjAKdgZAAgQkfCwzAgsDBAUCgl8jAQkHEAVkAoA1AgczlyIDczUDA2UhACH5BAUHABAALAAAAAAPABAAAAVjICSO0IGIATkqIiMKDaGKC8Q49jPMYsE0hQdrlABCGgvT45FKiRKQhWA0mPKGPAgBcTjsspBCAoH4gl+FmXNEUEBVAYHToJAVZK/XWoQQDAgBZioHaX8igigFKYYQVlkCjiMhACH5BAUHABAALAAAAAAQAA8AAAVgICSOUGGQqIiIChMESyo6CdQGdRqUENESI8FAdFgAFwqDISYwPB4CVSMnEhSej+FogNhtHyfRQFmIol5owmEta/fcKITB6y4choMBmk7yGgSAEAJ8JAVDgQFmKUCCZnwhACH5BAUHABAALAAAAAAQABAAAAViICSOYkGe4hFAiSImAwotB+si6Co2QxvjAYHIgBAqDoWCK2Bq6A40iA4yYMggNZKwGFgVCAQZotFwwJIF4QnxaC9IsZNgLtAJDKbraJCGzPVSIgEDXVNXA0JdgH6ChoCKKCEAIfkEBQcAEAAsAAAAABAADgAABUkgJI7QcZComIjPw6bs2kINLB5uW9Bo0gyQx8LkKgVHiccKVdyRlqjFSAApOKOtR810StVeU9RAmLqOxi0qRG3LptikAVQEh4UAACH5BAUHABAALAAAAAAQABAAAAVxICSO0DCQKBQQonGIh5AGB2sYkMHIqYAIN0EDRxoQZIaC6bAoMRSiwMAwCIwCggRkwRMJWKSAomBVCc5lUiGRUBjO6FSBwWggwijBooDCdiFfIlBRAlYBZQ0PWRANaSkED1oQYHgjDA8nM3kPfCmejiEAIfkEBQcAEAAsAAAAABAAEAAABWAgJI6QIJCoOIhFwabsSbiFAotGMEMKgZoB3cBUQIgURpFgmEI0EqjACYXwiYJBGAGBgGIDWsVicbiNEgSsGbKCIMCwA4IBCRgXt8bDACkvYQF6U1OADg8mDlaACQtwJCEAIfkEBQcAEAAsAAABABAADwAABV4gJEKCOAwiMa4Q2qIDwq4wiriBmItCCREHUsIwCgh2q8MiyEKODK7ZbHCoqqSjWGKI1d2kRp+RAWGyHg+DQUEmKliGx4HBKECIMwG61AgssAQPKA19EAxRKz4QCVIhACH5BAUHABAALAAAAAAQABAAAAVjICSOUBCQqHhCgiAOKyqcLVvEZOC2geGiK5NpQBAZCilgAYFMogo/J0lgqEpHgoO2+GIMUL6p4vFojhQNg8rxWLgYBQJCASkwEKLC17hYFJtRIwwBfRAJDk4ObwsidEkrWkkhACH5BAUHABAALAAAAQAQAA8AAAVcICSOUGAGAqmKpjis6vmuqSrUxQyPhDEEtpUOgmgYETCCcrB4OBWwQsGHEhQatVFhB/mNAojFVsQgBhgKpSHRTRxEhGwhoRg0CCXYAkKHHPZCZRAKUERZMAYGMCEAIfkEBQcAEAAsAAABABAADwAABV0gJI4kFJToGAilwKLCST6PUcrB8A70844CXenwILRkIoYyBRk4BQlHo3FIOQmvAEGBMpYSop/IgPBCFpCqIuEsIESHgkgoJxwQAjSzwb1DClwwgQhgAVVMIgVyKCEAIfkECQcAEAAsAAAAABAAEAAABWQgJI5kSQ6NYK7Dw6xr8hCw+ELC85hCIAq3Am0U6JUKjkHJNzIsFAqDqShQHRhY6bKqgvgGCZOSFDhAUiWCYQwJSxGHKqGAE/5EqIHBjOgyRQELCBB7EAQHfySDhGYQdDWGQyUhADs';
@@ -851,8 +855,7 @@ BetterMobileTwitter.prototype.constructSubList = function() {
     this.friendList = new Array();
   }
 
-  var subscribeDiv = document.getElementById('bmt-subscribediv');
-  subscribeDiv.style.minHeight = '';
+  this.subscribeDiv.style.minHeight = '';
 
   var html = '';
   html = '<li><span style="font-size:133%;font-weight:bold;">friends' +
@@ -861,14 +864,14 @@ BetterMobileTwitter.prototype.constructSubList = function() {
   for (var i=0;i<this.friendList.length;i++) {
     html = html + '<li><a href="#" bmt-viewuser="' + this.friendList[i].screen_name + '">' + this.friendList[i].screen_name + '</a> (' + this.friendList[i].name + ')</li>';
   }
-  subscribeDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>subscriptions</b></div>'+
-                           '<ul>' + html + '</ul>';
+  this.subscribeDiv.innerHTML = '<div class="s" style="font-size:133%;"><b>subscriptions</b></div>'+
+                                '<ul>' + html + '</ul>';
 
-  var sublinks = subscribeDiv.getElementsByTagName('a');
+  var sublinks = this.subscribeDiv.getElementsByTagName('a');
   if (sublinks.length) {
     sublinks[0].addEventListener('click', function(e) {
       e.preventDefault();
-      bmt.loadFriends(1, [], subscribeDiv.getElementsByTagName('ul')[0], bmt.constructSubList);
+      bmt.loadFriends(1, [], bmt.constructSubList);
     }, false);
   }
   for (var i=1;i<sublinks.length;i++) {
@@ -880,11 +883,11 @@ BetterMobileTwitter.prototype.constructSubList = function() {
   }
 }
 
-BetterMobileTwitter.prototype.loadFriends = function(page, friends, subscribeDiv, func) {
+BetterMobileTwitter.prototype.loadFriends = function(page, friends, func) {
   var bmt = this;
 
   page = Math.max(page, 1);
-  subscribeDiv.innerHTML = 'loading friends ' + ((page-1)*100+1) + ' to ' + ((1)*100) + '...';
+  this.subscribeDiv.getElementsByTagName('ul')[0].innerHTML = 'loading friends ' + ((page-1)*100+1) + ' to ' + ((1)*100) + '...';
 
   var client = new XMLHttpRequest();
   client.onreadystatechange = function() {
@@ -900,7 +903,7 @@ BetterMobileTwitter.prototype.loadFriends = function(page, friends, subscribeDiv
           });
         }
         if (page < 5 && pagefriend.length >= 100) {
-          bmt.loadFriends(page + 1, friends, subscribeDiv, func);
+          bmt.loadFriends(page + 1, friends, func);
         }
         else {
           friends = friends.sort(function(a, b) {
@@ -948,11 +951,11 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
 
   // add replies layer
   this.tweetsDiv = document.createElement('div');
-  var leftBarDiv = document.createElement('div');
+  this.leftBarDiv = document.createElement('div');
   this.rightBarDiv = document.createElement('div');
   var tweetsUl = document.getElementsByTagName('ul')[0];
 
-  this.tweetsDiv.setAttribute('style', 'width:80%;');
+  this.tweetsDiv.setAttribute('style', 'margin-left:200px;');
   this.tweetsDiv.setAttribute('id', 'bmt-tweetsdiv');
 
   this.rightBarDiv.setAttribute('style', 'float:right; width:19%; margin-left:1%; margin-right:3px; ');
@@ -967,15 +970,13 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   this.replyDiv.setAttribute('id', 'bmt-replydiv');
   this.rightBarDiv.appendChild(this.replyDiv);
 
-  leftBarDiv.setAttribute('style', 'float:left; width:190px; margin-left:3px; margin-right:10px;');
-  var subscribeDiv = document.createElement('div');
-  subscribeDiv.setAttribute('style', 'min-height: 300px; padding:5px; font-size: 75%; ' +
-                                     'background:#e5e5ff; border:1px solid #87bc44; ' +
-                                     '-moz-border-radius:5px; -webkit-border-radius: 5px;');
-  subscribeDiv.setAttribute('id', 'bmt-subscribediv');
-  leftBarDiv.appendChild(subscribeDiv);
+  this.leftBarDiv.setAttribute('style', 'float:left; width:190px; margin-left:3px; margin-right:10px;');
+  this.subscribeDiv = document.createElement('div');
+  this.subscribeDiv.setAttribute('style', this.SUBSCRIBE_CSS);
+  this.subscribeDiv.setAttribute('id', 'bmt-subscribediv');
+  this.leftBarDiv.appendChild(this.subscribeDiv);
 
-  tweetsUl.parentNode.insertBefore(leftBarDiv, tweetsUl);
+  tweetsUl.parentNode.insertBefore(this.leftBarDiv, tweetsUl);
   tweetsUl.parentNode.insertBefore(this.rightBarDiv, tweetsUl);
   tweetsUl.parentNode.insertBefore(this.tweetsDiv, tweetsUl);
   this.tweetsDiv.appendChild(tweetsUl);
