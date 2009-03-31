@@ -17,9 +17,8 @@ Date:   2009-03-17
 
 Version history:
 6    (beta)         View other's tweets inline (no page refresh)
-                    Add @mentions sidebar
-                    Show link of direct messages, @mentions, replies to can see full page
-                    @mentions and direct message side bar can collapse after expand
+                    Show link of direct messages, replies to can see full page
+                    direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
                     ExpandUrl supports burnurl.com, snurl.com, bitly.com
                     ExpandUrl image supports skitch.com, phodroid.com
@@ -68,14 +67,11 @@ function BetterMobileTwitter() {
   this.tweetsDiv = null;
   this.rightBarDiv = null;
   this.directDiv = null;
-  this.mentionDiv = null;
   this.replyDiv = null;
 
   this.CHECK_UPDATE_INTERVAL = 60000;   // millisecond
   this.DETECT_SCROLL_INTERVAL = 500;    // millisecond
   this.DIRECT_MESSAGE_MAX_DISPLAY = 2;
-  this.MENTIONS_MAX_DISPLAY = 2;
-  this.MENTIONS_MAX_PAGE = 3;
   this.EXPANDURL_INIT_COUNT = 3;
 
   this.RIGHT_BAR_BOX_CSS = 'min-height: 100px; padding:5px; font-size: 75%; ' +
@@ -382,81 +378,6 @@ BetterMobileTwitter.prototype.inlineViewUser = function(username) {
   this.page = 0;
   scroll(0, 0);
   this.nextPage();
-}
-
-BetterMobileTwitter.prototype.loadMentions = function(displayCount) {
-  this.mentionDiv.innerHTML = 'Loading @mentions ...';
-
-  this.loadMentionsPage(displayCount, 1, '', 0);
-}
-
-BetterMobileTwitter.prototype.loadMentionsPage = function(displayCount, page, html, mentionsCount) {
-  var bmt = this;
-  GM_xmlhttpRequest({
-    method: 'GET',
-    url: 'http://search.twitter.com/search?q=%40' + bmt.myname + (page>1?'&page='+page:''),
-    onload: function(t) {
-      var olbody = bmt.extract(t.responseText, '<div id="results">');
-      var cont = true;
-      while (cont) {
-        var t = bmt.extract(olbody, '<li class="result', '</li>');
-        if (t) {
-          t = bmt.extract(t, '<div class="msg">', '<span class="source">');
-          // change div class=info to small to display the tweets time
-          t = t.replace(/<div class="info">\s*(.*)\s*$/m, '<small>$1</small>');
-          // remove all span tags
-          t = t.replace(/<\/?span[^>]*>/g, '');
-          // remove all span tags
-          t = t.replace(/<\/?div[^>]*>/g, '');
-          // remove all target attribute
-          t = t.replace(/\s+target="[^"]*"/g, '');
-          // remove all onclick attribute
-          t = t.replace(/\s+onclick="[^"]*"/g, '');
-          // change the search topic link
-          t = t.replace(/<a href="\/search\?([^"]*)/g, '<a href="http://search.twitter.com/search?$1');
-          // remove the expand link. e.g. (<a class="lit" ...>expand</a><img .../>)
-          t = t.replace(/\(<a class="lit"[^>]*>.*[^>]*>.*[^>]*>\)/g, '');
-          // finally remove invalid chars
-          t = bmt.removeInvalidChar(t);
-
-          var checkIsReply = t.match(/<a href="[^"]+"[^>]*>[^<]*<\/a>: <a href="([^"]+)"/);
-          if (!checkIsReply || !checkIsReply[1].match('\\/' + bmt.myname + '$')) {
-            html = html + '<li' + (++mentionsCount > displayCount?' class="bmt-moreitem" style="display:none;"':'') + '>' + t + '</li>';
-          }
-
-          olbody = bmt.extract(olbody, '</li>');
-        }
-        else {
-          cont = false;
-        }
-      }
-      if (page == bmt.MENTIONS_MAX_PAGE || (page > 1 && mentionsCount >= displayCount )) {
-        // Since the layer has set the min-height style, clear it so it won't take up too much space if no message
-        bmt.mentionDiv.style.minHeight = '';
-
-        bmt.mentionDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
-                                   '<a href="http://search.twitter.com/search?q=%40' + bmt.myname + '"><b>@mentions</b></a>' +
-                                   (mentionsCount > displayCount?' <div id="bmt-mentiondiv-expand" style="' +
-                                   'background-image:url(' + bmt.buttonsrc + '); background-position:0px 0px;' +
-                                   'width:16px; height:16px;padding:0px;float:right;cursor:pointer;"></div>':'') +
-                                   '</div><ul>' + html + '</ul>';
-        var expandLink = document.getElementById('bmt-mentiondiv-expand');
-        if (expandLink) {
-          expandLink.addEventListener('click', function(e) {
-            var isExpand = e.target.style.backgroundPosition == '0px 0px';
-            var lilist = bmt.mentionDiv.getElementsByClassName('bmt-moreitem');
-            for (var i=0;i<lilist.length;i++) {
-              lilist[i].style.display = isExpand?'':'none';
-            }
-            e.target.style.backgroundPosition = isExpand?'-16px 0px':'0px 0px';
-          }, false);
-        }
-      }
-      else {
-        bmt.loadMentionsPage(displayCount, ++page, html, mentionsCount);
-      }
-    }
-  });
 }
 
 BetterMobileTwitter.prototype.calcOffsetTop = function(e) {
@@ -911,13 +832,6 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   this.directDiv.setAttribute('id', 'bmt-directdiv');
   this.rightBarDiv.appendChild(this.directDiv);
 
-  if (this.supportXSS) {
-    this.mentionDiv = document.createElement('div');
-    this.mentionDiv.setAttribute('style', this.RIGHT_BAR_BOX_CSS + ' margin-top:8px;');
-    this.mentionDiv.setAttribute('id', 'bmt-mentiondiv');
-    this.rightBarDiv.appendChild(this.mentionDiv);
-  }
-
   this.replyDiv = document.createElement('div');
   this.replyDiv.setAttribute('style', this.RIGHT_BAR_BOX_CSS + ' margin-top:8px;');
   this.replyDiv.setAttribute('id', 'bmt-replydiv');
@@ -928,9 +842,6 @@ BetterMobileTwitter.prototype.functionPrinciple = function() {
   this.tweetsDiv.appendChild(tweetsUl);
 
   this.loadDirectMessage(this.DIRECT_MESSAGE_MAX_DISPLAY);
-  if (this.supportXSS) {
-    this.loadMentions(this.MENTIONS_MAX_DISPLAY);
-  }
   this.loadReplies();
 
   // modify status window
