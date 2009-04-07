@@ -21,7 +21,7 @@ Version history:
                     direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
                     ExpandUrl supports burnurl.com, snurl.com, bitly.com
-                    ExpandUrl image supports skitch.com, phodroid.com
+                    ExpandUrl image supports mobypicture.com, phodroid.com, skitch.com
                     ExpandUrl matches url better for tinyurl
                     ExpandUrl fix the hellotxt and twitpic image layout changed
                     Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
@@ -114,6 +114,7 @@ function BetterMobileTwitter() {
     {name:'flickr',      func:this.expandUrl_flickr,      ajax:true,  match:'url',  regex:/(www\.)?flickr\.com\/photos/},
     {name:'pingfmimg',   func:this.expandUrl_pingfmimg,   ajax:true,  match:'url',  regex:/http:\/\/ping\.fm\/p\/[a-zA-z0-9]+$/},
     {name:'hellotxtimg', func:this.expandUrl_hellotxtimg, ajax:true,  match:'url',  regex:/http:\/\/hellotxt\.com\/i\/[a-zA-z0-9]+$/},
+    {name:'mobypicture', func:this.expandUrl_mobypicture, ajax:true,  match:'url',  regex:/http:\/\/mobypicture\.com\/\?[A-z0-9]+$/},
     {name:'skitch',      func:this.expandUrl_skitch,      ajax:true,  match:'url',  regex:/http:\/\/skitch\.com\//},
     {name:'phodroid',    func:this.expandUrl_phodroid,    ajax:true,  match:'url',  regex:/http:\/\/phodroid\.com\//},
     {name:'youtube',     func:this.expandUrl_youtube,     ajax:false, match:'url',  regex:/http:\/\/[a-z]*\.youtube\.com\//},
@@ -618,6 +619,13 @@ BetterMobileTwitter.prototype.expandUrl_skitch = function(bmt, a, url, t) {
 BetterMobileTwitter.prototype.expandUrl_phodroid = function(bmt, a, url, t) {
   bmt.sessionStorageWrapper_image(a, url, t, 'phodroid', function() {
     return bmt.extract(t.responseText, 'div id="photo"><img src="', '"');
+  });
+}
+
+BetterMobileTwitter.prototype.expandUrl_mobypicture = function(bmt, a, url, t) {
+  bmt.sessionStorageWrapper_image(a, url, t, 'mobypicture', function() {
+    var res = t.responseText.match(/src="([^"]+)" id="main_picture"/);
+    return res?res[1]:'';
   });
 }
 
