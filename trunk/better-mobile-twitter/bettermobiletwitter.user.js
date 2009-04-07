@@ -108,7 +108,7 @@ function BetterMobileTwitter() {
     {name:'hellotxt',    func:this.expandUrl_tinyurl,     ajax:true,  match:'url',  regex:/http:\/\/hellotxt\.com\/l\/[a-zA-z0-9]+$/},
     {name:'hellotxttxt', func:this.expandUrl_hellotxt,    ajax:true,  match:'url',  regex:/http:\/\/hellotxt\.com\/[a-zA-z0-9]+$/},
     {name:'burnurl',     func:this.expandUrl_burnurl,     ajax:true,  match:'url',  regex:/http:\/\/burnurl\.com\/[a-zA-z0-9]+$/},
-    //{name:'funp',        func:this.expandUrl_tinyurl,     ajax:true,  match:'url',  regex:/http:\/\/funp\.com\//},
+    {name:'funp',        func:this.expandUrl_funp,        ajax:true,  match:'url',  regex:/http:\/\/funp\.com\/[A-z0-9]+$/},
     {name:'twitpic',     func:this.expandUrl_twitpic,     ajax:true,  match:'url',  regex:/http:\/\/twitpic\.com\/[a-zA-z0-9]+$/},
     {name:'tapulous',    func:this.expandUrl_tapulous,    ajax:true,  match:'url',  regex:/http:\/\/twinkle\.tapulous\.com\/index\.php\?hash=/},
     {name:'flickr',      func:this.expandUrl_flickr,      ajax:true,  match:'url',  regex:/(www\.)?flickr\.com\/photos/},
@@ -558,6 +558,26 @@ BetterMobileTwitter.prototype.expandUrl_burnurl = function(bmt, a, url, t) {
     else {
       return null;
     }
+  });
+
+  if (finalUrl && url != finalUrl) {
+    a.innerHTML = bmt.encodeHTML(decodeURIComponent(finalUrl));
+    a.href = finalUrl;
+    a.setAttribute('bmt-finalurl', finalUrl);
+  }
+
+  bmt.expandUrl(1);
+}
+
+BetterMobileTwitter.prototype.expandUrl_funp = function(bmt, a, url, t) {
+  var finalUrl = bmt.sessionStorageWrapper(url, t, 'funp', function() {
+    var id = url.match(/\d+$/);
+    if (id) {
+      id = id[0];
+      return bmt.extract(bmt.extract(t.responseText, 'id="title_' + id + '"'), "return preview('", "'");
+    }
+
+    return null;
   });
 
   if (finalUrl && url != finalUrl) {
