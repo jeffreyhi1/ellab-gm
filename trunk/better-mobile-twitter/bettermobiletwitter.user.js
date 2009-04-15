@@ -591,7 +591,7 @@ BetterMobileTwitter.prototype.expandUrl_funp = function(bmt, a, url, t) {
 
 BetterMobileTwitter.prototype.expandUrl_twitpic = function(bmt, a, url, t) {
   bmt.sessionStorageWrapper_image(a, url, t, 'twitpic', function() {
-    return bmt.extract(bmt.extract(t.responseText, '<div id="photo"'), '<img class="photo-large" src="', '"');
+    return bmt.extract(t.responseText, '<img id="photo-display" class="photo-large" src="', '"');
   });
 }
 
