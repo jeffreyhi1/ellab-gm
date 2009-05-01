@@ -271,7 +271,7 @@ BetterMobileTwitter.prototype.nextPage = function() {
     client.open('GET', document.location.protocol + '//' + document.location.host + '/account/profile.mobile?user=' + this.viewingUsername + '&page=' + (this.page + 1));
   }
   else {
-    client.open('GET', document.location.protocol + '//' + document.location.host + '/account/home.mobile?page=' + (this.page + 1));
+    client.open('GET', document.location.protocol + '//' + document.location.host + '/timeline/home?format=mobile&page=' + (this.page + 1));
   }
   client.send(null);
 }
@@ -450,7 +450,7 @@ BetterMobileTwitter.prototype.checkUpdate = function() {
       window.setTimeout(function() {bmt.checkUpdate();}, bmt.CHECK_UPDATE_INTERVAL);
     }
   }
-  client.open('GET', document.location.protocol + '//' + document.location.host + '/account/home.mobile');
+  client.open('GET', document.location.protocol + '//' + document.location.host + '/home');
   client.send(null);
 }
 
