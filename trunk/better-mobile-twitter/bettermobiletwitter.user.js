@@ -20,7 +20,7 @@ Version history:
                     Show link of direct messages, replies to can see full page
                     direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
-                    ExpandUrl supports burnurl.com, snurl.com, bitly.com
+                    ExpandUrl supports burnurl.com, funp.com, ow.ly, snurl.com, bitly.com
                     ExpandUrl image supports mobypicture.com, phodroid.com, skitch.com
                     ExpandUrl matches url better for tinyurl
                     ExpandUrl fix the hellotxt and twitpic image layout changed
@@ -108,6 +108,7 @@ function BetterMobileTwitter() {
     {name:'hellotxt',    func:this.expandUrl_tinyurl,     ajax:true,  match:'url',  regex:/http:\/\/hellotxt\.com\/l\/[a-zA-z0-9]+$/},
     {name:'hellotxttxt', func:this.expandUrl_hellotxt,    ajax:true,  match:'url',  regex:/http:\/\/hellotxt\.com\/[a-zA-z0-9]+$/},
     {name:'burnurl',     func:this.expandUrl_burnurl,     ajax:true,  match:'url',  regex:/http:\/\/burnurl\.com\/[a-zA-z0-9]+$/},
+    {name:'owly',        func:this.expandUrl_owly,        ajax:true,  match:'url',  regex:/http:\/\/ow\.ly\/[A-z0-9]+$/},
     {name:'funp',        func:this.expandUrl_funp,        ajax:true,  match:'url',  regex:/http:\/\/funp\.com\/[A-z0-9]+$/},
     {name:'twitpic',     func:this.expandUrl_twitpic,     ajax:true,  match:'url',  regex:/http:\/\/twitpic\.com\/[a-zA-z0-9]+$/},
     {name:'tapulous',    func:this.expandUrl_tapulous,    ajax:true,  match:'url',  regex:/http:\/\/twinkle\.tapulous\.com\/index\.php\?hash=/},
@@ -558,6 +559,20 @@ BetterMobileTwitter.prototype.expandUrl_burnurl = function(bmt, a, url, t) {
     else {
       return null;
     }
+  });
+
+  if (finalUrl && url != finalUrl) {
+    a.innerHTML = bmt.encodeHTML(decodeURIComponent(finalUrl));
+    a.href = finalUrl;
+    a.setAttribute('bmt-finalurl', finalUrl);
+  }
+
+  bmt.expandUrl(1);
+}
+
+BetterMobileTwitter.prototype.expandUrl_owly = function(bmt, a, url, t) {
+  var finalUrl = bmt.sessionStorageWrapper(url, t, 'owly', function() {
+    return bmt.extract(bmt.extract(t.responseText, '<frame '), '<frame src="', '"');
   });
 
   if (finalUrl && url != finalUrl) {
