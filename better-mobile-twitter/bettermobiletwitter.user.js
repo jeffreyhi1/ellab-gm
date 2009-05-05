@@ -679,7 +679,6 @@ BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
 
 BetterMobileTwitter.prototype.expandUrl_qik = function(bmt, a, url, t) {
   var videoid = bmt.extract(t.responseText, '<link rel="videothumbnail" href="http://media.qik.com/media.thumbnails.320/', '.jpg');
-  alert(videoid);
   if (videoid) {
     bmt.expandUrl_image(a, url, 'http://media.qik.com/media.thumbnails.128/' + videoid + '.jpg');
   }
