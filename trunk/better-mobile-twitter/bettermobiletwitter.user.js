@@ -21,7 +21,7 @@ Version history:
                     direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
                     ExpandUrl supports burnurl.com, funp.com, ow.ly, snurl.com, bitly.com
-                    ExpandUrl image supports mobypicture.com, phodroid.com, skitch.com
+                    ExpandUrl image supports mobypicture.com, phodroid.com, skitch.com, qik.com
                     ExpandUrl matches url better for tinyurl
                     ExpandUrl fix the hellotxt and twitpic image layout changed
                     Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
@@ -119,6 +119,7 @@ function BetterMobileTwitter() {
     {name:'skitch',      func:this.expandUrl_skitch,      ajax:true,  match:'url',  regex:/http:\/\/skitch\.com\//},
     {name:'phodroid',    func:this.expandUrl_phodroid,    ajax:true,  match:'url',  regex:/http:\/\/phodroid\.com\//},
     {name:'youtube',     func:this.expandUrl_youtube,     ajax:false, match:'url',  regex:/http:\/\/[a-z]*\.youtube\.com\//},
+    {name:'qik',         func:this.expandUrl_qik,         ajax:true,  match:'url',  regex:/http:\/\/qik\.com\/video\/[0-9]+/},
     {name:'img',         func:this.expandUrl_img,         ajax:false, match:'url',  regex:/http:\/\/.*\.(gif|jpg|png)$/},
     {name:'googlelogin', func:this.expandUrl_googlelogin, ajax:false, match:'url',  regex:/^https?:\/\/[^\/]*\.google\.com?(\.[a-zA-Z]{1,2})?\/accounts\/ServiceLogin\?/},
     {name:'ellipse',     func:this.expandUrl_ellipse,     ajax:false, match:'html', regex:/\.\.\.+$/},
@@ -670,6 +671,17 @@ BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
     a.innerHTML = a.innerHTML.replace(/([\?|&]v=[a-zA-Z0-9_\-]*)(&.*$)/, '$1&amp;...');
 
     bmt.expandUrl_image(a, url, 'http://i4.ytimg.com/vi/' + res[1] + '/default.jpg');
+  }
+  else {
+    bmt.expandUrl_longurl(bmt, a, url);
+  }
+}
+
+BetterMobileTwitter.prototype.expandUrl_qik = function(bmt, a, url, t) {
+  var videoid = bmt.extract(t.responseText, '<link rel="videothumbnail" href="http://media.qik.com/media.thumbnails.320/', '.jpg');
+  alert(videoid);
+  if (videoid) {
+    bmt.expandUrl_image(a, url, 'http://media.qik.com/media.thumbnails.128/' + videoid + '.jpg');
   }
   else {
     bmt.expandUrl_longurl(bmt, a, url);
