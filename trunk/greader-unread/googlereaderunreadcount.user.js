@@ -1,18 +1,20 @@
 // ==UserScript==
 // @name            Google Reader Unread Count
-// @version         5
+// @version         6
 // @namespace       http://ellab.org/
 // @author          angusdev
 // @description     Display actual unread count instead of "1000+" in Google Reader
-// @include         http*://www.google.com/reader/*
+// @include         http://www.google.tld/reader/*
+// @include         https://www.google.tld/reader/*
 // ==/UserScript==
 
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2009-03-20
+Date:   2009-05-14
 
 Version history:
+6    14-May-2009    @include uses top-level-domain (tld) conversion
 5    20-Mar-2009    Change the window title to (xxx) Google Reader
                     Listen to DOMTitleChanged event (gecko specified) so can response faster window title changed by Google
 4    12-Nov-2008    Support Chrome
