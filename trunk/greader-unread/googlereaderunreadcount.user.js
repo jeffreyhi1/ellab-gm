@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Google Reader Unread Count
-// @version         6
+// @version         7
 // @namespace       http://ellab.org/
 // @author          angusdev
 // @description     Display actual unread count instead of "1000+" in Google Reader
@@ -14,6 +14,7 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2009-05-14
 
 Version history:
+7    02-Oct-2009    Support Chrome extensions
 6    14-May-2009    @include uses top-level-domain (tld) conversion
 5    20-Mar-2009    Change the window title to (xxx) Google Reader
                     Listen to DOMTitleChanged event (gecko specified) so can response faster window title changed by Google
@@ -48,7 +49,7 @@ var GReaderUnreadCount = {
       window.setInterval(GReaderUnreadCount.titleChanged, 3000);
     }
     else {
-     setTimeout(GReaderUnreadCount.waitForReady, 500);
+      window.setTimeout(GReaderUnreadCount.waitForReady, 500);
     }
   },
 
