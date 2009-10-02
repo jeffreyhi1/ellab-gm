@@ -14,11 +14,11 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2009-05-14
 
 Version history:
-7    02-Oct-2009    Support Chrome extensions
+7    02-Oct-2009    Supports Chrome extensions
 6    14-May-2009    @include uses top-level-domain (tld) conversion
 5    20-Mar-2009    Change the window title to (xxx) Google Reader
                     Listen to DOMTitleChanged event (gecko specified) so can response faster window title changed by Google
-4    12-Nov-2008    Support Chrome
+4    12-Nov-2008    Supports Chrome
                     Fix the bug that didn't show the '+' sign in total if a feed has 1000+ unread items
 3    06-Nov-2008    Fix the problem due to Google changed DOM
                     Fix the problem that didn't count the untagged item
