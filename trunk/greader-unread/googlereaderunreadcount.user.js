@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Google Reader Unread Count
-// @version         7
+// @version         8
 // @namespace       http://ellab.org/
 // @author          angusdev
 // @description     Display actual unread count instead of "1000+" in Google Reader
@@ -11,9 +11,10 @@
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2009-05-14
+Date:   2009-10-24
 
 Version history:
+8    24-Oct-2009    Issue #1 The node no longer has feed url, so use the node title as duplication check
 7    02-Oct-2009    Supports Chrome extensions
 6    14-May-2009    @include uses top-level-domain (tld) conversion
 5    20-Mar-2009    Change the window title to (xxx) Google Reader
@@ -70,7 +71,7 @@ var GReaderUnreadCount = {
     }
   },
 
-  findItemUnread:function(countedUrl, item) {
+  findItemUnread:function(checkDuplicated, item) {
     var hasplus = false;
     var count = 0;
     var alreadyCounted = false;
@@ -80,11 +81,14 @@ var GReaderUnreadCount = {
       if (item.innerHTML.match(/\(1000\+\)/)) {
         hasplus = true;
       }
-      if (countedUrl.indexOf(item.parentNode.parentNode.href) < 0) {
-        countedUrl[countedUrl.length] = item.parentNode.parentNode.href;
-      }
-      else {
-        alreadyCounted = true;
+      var nodeTitle = item.parentNode.getAttribute('title');
+      if (nodeTitle) {
+        if (checkDuplicated.indexOf(nodeTitle) < 0) {
+          checkDuplicated.push(nodeTitle);
+        }
+        else {
+          alreadyCounted = true;
+        }
       }
     }
 
@@ -92,7 +96,7 @@ var GReaderUnreadCount = {
   },
 
   calcUnread:function() {
-    var countedUrl = new Array();
+    var checkDuplicated = new Array();
     var res = document.evaluate("//li[contains(@class, 'folder')]//li[contains(@class, 'folder')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
     var total = 0;
     var totalplus = false;
@@ -101,7 +105,7 @@ var GReaderUnreadCount = {
       var subtotal = 0;
       var subtotalplus = false;
       for (var j=0;j<res2.snapshotLength;j++) {
-        var result = GReaderUnreadCount.findItemUnread(countedUrl, res2.snapshotItem(j));
+        var result = GReaderUnreadCount.findItemUnread(checkDuplicated, res2.snapshotItem(j));
         if (result.hasplus) {
           totalplus = true;
           subtotalplus = true;
@@ -122,7 +126,7 @@ var GReaderUnreadCount = {
     // untagged items
     var res2 = document.evaluate("//ul[@id='sub-tree']/li/ul/li[not(contains(@class, 'folder')) and contains(@class, 'unread')]/a/span/span[contains(@class, 'unread-count')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
     for (var j=0;j<res2.snapshotLength;j++) {
-      var result = GReaderUnreadCount.findItemUnread(countedUrl, res2.snapshotItem(j));
+      var result = GReaderUnreadCount.findItemUnread(checkDuplicated, res2.snapshotItem(j));
       if (result.hasplus) {
         totalplus = true;
       }
