@@ -1,0 +1,16 @@
+{
+  "name": "Better Mobile Twitter",
+  "version": "6",
+  "description": "To enhance the mobile twitter page.",
+  "background_page": "background.html",
+  "content_scripts": [
+    {
+      "matches": ["http://twitter.com/*", "https://twitter.com/*",
+                  "http://m.twitter.com/*", "https://m.twitter.com/*"],
+      "js": ["xhrproxy.js", "bettermobiletwitter.user.js"]
+    }
+  ],
+  "permissions": [
+    "http://*/"
+  ]
+}
