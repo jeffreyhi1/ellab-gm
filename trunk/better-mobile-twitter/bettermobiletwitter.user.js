@@ -22,7 +22,7 @@ Version history:
                     direct message side bar can collapse after expand
                     Add the switch to standard version button to page top
                     ExpandUrl supports burnurl.com, funp.com, ow.ly, snurl.com, bitly.com
-                    ExpandUrl image supports mobypicture.com, phodroid.com, skitch.com, qik.com
+                    ExpandUrl image supports mobypicture.com, phodroid.com, skitch.com, qik.com, flic.kr, yfrog
                     ExpandUrl matches url better for tinyurl
                     ExpandUrl fix the hellotxt and twitpic image layout changed
                     Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
@@ -108,6 +108,7 @@ function BetterMobileTwitter() {
   this.expandUrlMap['snurl']       = { type:'redirect',                             match:'url',  regex:/http:\/\/snurl.com\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['hellotxt']    = { type:'redirect',                             match:'url',  regex:/http:\/\/hellotxt\.com\/l\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['flic.kr']     = { type:'redirect',                             match:'url',  regex:/http:\/\/flic\.kr\/p\/[a-zA-z0-9]+$/ };
+  this.expandUrlMap['yfrog']       = { type:'redirect',                             match:'url',  regex:/http:\/\/yfrog\.com\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['hellotxttxt'] = { func:this.expandUrl_hellotxt,    ajax:true,  match:'url',  regex:/http:\/\/hellotxt\.com\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['burnurl']     = { func:this.expandUrl_burnurl,     ajax:true,  match:'url',  regex:/http:\/\/burnurl\.com\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['owly']        = { func:this.expandUrl_owly,        ajax:true,  match:'url',  regex:/http:\/\/ow\.ly\/[A-z0-9]+$/ };
@@ -120,6 +121,7 @@ function BetterMobileTwitter() {
   this.expandUrlMap['mobypicture'] = { func:this.expandUrl_mobypicture, ajax:true,  match:'url',  regex:/http:\/\/mobypicture\.com\/\?[A-z0-9]+$/ };
   this.expandUrlMap['skitch']      = { func:this.expandUrl_skitch,      ajax:true,  match:'url',  regex:/http:\/\/skitch\.com\// };
   this.expandUrlMap['phodroid']    = { func:this.expandUrl_phodroid,    ajax:true,  match:'url',  regex:/http:\/\/phodroid\.com\// };
+  this.expandUrlMap['yfrogimg']    = { func:this.expandUrl_yfrogimg,    ajax:true,  match:'url',  regex:/http:\/\/.*\.yfrog\.com\/i\// };
   this.expandUrlMap['youtube']     = { func:this.expandUrl_youtube,     ajax:false, match:'url',  regex:/http:\/\/[a-z]*\.youtube\.com\// };
   this.expandUrlMap['qik']         = { func:this.expandUrl_qik,         ajax:true,  match:'url',  regex:/http:\/\/qik\.com\/video\/[0-9]+/ };
   this.expandUrlMap['img']         = { func:this.expandUrl_img,         ajax:false, match:'url',  regex:/http:\/\/.*\.(gif|jpg|png)$/ };
@@ -746,6 +748,12 @@ BetterMobileTwitter.prototype.expandUrl_mobypicture = function(bmt, a, url, t) {
   bmt.sessionStorageWrapper_image(a, url, t, 'mobypicture', function() {
     var res = t.responseText.match(/src="([^"]+)" id="main_picture"/);
     return res?res[1]:'';
+  });
+}
+
+BetterMobileTwitter.prototype.expandUrl_yfrogimg = function(bmt, a, url, t) {
+  bmt.sessionStorageWrapper_image(a, url, t, 'yfrogimg', function() {
+    return bmt.extract(t.responseText, '<link rel="image_src" href="', '" />');
   });
 }
 
