@@ -107,6 +107,7 @@ function BetterMobileTwitter() {
   this.expandUrlMap['shortto']     = { type:'redirect',                             match:'url',  regex:/http:\/\/short\.to\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['snurl']       = { type:'redirect',                             match:'url',  regex:/http:\/\/snurl.com\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['hellotxt']    = { type:'redirect',                             match:'url',  regex:/http:\/\/hellotxt\.com\/l\/[a-zA-z0-9]+$/ };
+  this.expandUrlMap['flic.kr']     = { type:'redirect',                             match:'url',  regex:/http:\/\/flic\.kr\/p\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['hellotxttxt'] = { func:this.expandUrl_hellotxt,    ajax:true,  match:'url',  regex:/http:\/\/hellotxt\.com\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['burnurl']     = { func:this.expandUrl_burnurl,     ajax:true,  match:'url',  regex:/http:\/\/burnurl\.com\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['owly']        = { func:this.expandUrl_owly,        ajax:true,  match:'url',  regex:/http:\/\/ow\.ly\/[A-z0-9]+$/ };
