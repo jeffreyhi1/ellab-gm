@@ -26,6 +26,7 @@ Version history:
                     ExpandUrl matches url better for tinyurl
                     ExpandUrl fix the hellotxt and twitpic image layout changed
                     Provide limited support of ExpandUrl in Chrome (those doesn't need cross site ajax)
+                    Fix the direct messages sidebar as twitter changed HTML
                     @include more URLs instead of only http://m.twitter.com/home
 5    17-Mar-2009    Add direct messages sidebar
                     Add replies sidebar
@@ -392,9 +393,9 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
         while (cont) {
           var t = bmt.extract(olbody, '<li', '</li>');
           if (t) {
-            t = bmt.extract(t, 'status-body">', '<span class="action');
-            // span class="published" is the publish time, change to <small> as used in mobile version
-            t = t.replace(/<span class="published">([^<]*)<\/span>/, ' <small>$1</small>');
+            t = bmt.extract(t, 'status-body">', '<ul class="actions-hover">');
+            // span class="published timestamp" is the publish time, change to <small> as used in mobile version
+            t = t.replace(/<span class="published [^>]*>([^<]*)<\/span>/, ' <small>$1</small>');
             // remove all span tags
             t = t.replace(/<\/?span[^>]*>/g, '');
             // remove all image tags
@@ -409,14 +410,14 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
             t = bmt.removeInvalidChar(t);
             html = html + '<li' + (++count > displayCount?' class="bmt-moreitem" style="display:none;"':'') + '>' + t + '</li>';
 
-            olbody = bmt.extract(olbody, '</li>');
+            olbody = bmt.extract(bmt.extract(olbody, '</li>'), '</li>');
           }
           else {
             cont = false;
           }
         }
         directMessageDiv.innerHTML = '<div class="s" style="font-size:133%;">' +
-                                     '<a href="http://' + document.location.host + '/direct_messages"><b>direct messages</b></a>' +
+                                     '<a href="http://' + document.location.host + '/inbox"><b>direct messages</b></a>' +
                                      (count > displayCount?' <div id="bmt-directdiv-expand" style="' +
                                      'background-image:url(' + bmt.buttonsrc + '); background-position:0px 0px;' +
                                      'width:16px; height:16px;padding:0px;float:right;cursor:pointer;"></div>':'') +
@@ -438,7 +439,7 @@ BetterMobileTwitter.prototype.loadDirectMessage = function(displayCount) {
       }
     }
   }
-  client.open('GET', document.location.protocol + '//' + document.location.host + '/direct_messages');
+  client.open('GET', document.location.protocol + '//' + document.location.host + '/inbox');
   client.send(null);
 }
 
