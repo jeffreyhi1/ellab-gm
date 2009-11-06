@@ -124,6 +124,7 @@ function BetterMobileTwitter() {
   this.expandUrlMap['phodroid']    = { func:this.expandUrl_phodroid,    ajax:true,  match:'url',  regex:/http:\/\/phodroid\.com\// };
   this.expandUrlMap['yfrogimg']    = { func:this.expandUrl_yfrogimg,    ajax:true,  match:'url',  regex:/http:\/\/.*\.yfrog\.com\/i\// };
   this.expandUrlMap['youtube']     = { func:this.expandUrl_youtube,     ajax:false, match:'url',  regex:/http:\/\/[a-z]*\.youtube\.com\// };
+  this.expandUrlMap['twitvid']     = { func:this.expandUrl_twitvid,     ajax:false, match:'url',  regex:/http:\/\/twitvid\.com\/[a-zA-z0-9]+$/ };
   this.expandUrlMap['qik']         = { func:this.expandUrl_qik,         ajax:true,  match:'url',  regex:/http:\/\/qik\.com\/video\/[0-9]+/ };
   this.expandUrlMap['img']         = { func:this.expandUrl_img,         ajax:false, match:'url',  regex:/http:\/\/.*\.(gif|jpg|png)$/ };
   this.expandUrlMap['googlelogin'] = { func:this.expandUrl_googlelogin, ajax:false, match:'url',  regex:/^https?:\/\/[^\/]*\.google\.com?(\.[a-zA-Z]{1,2})?\/accounts\/ServiceLogin\?/ };
@@ -767,6 +768,13 @@ BetterMobileTwitter.prototype.expandUrl_youtube = function(bmt, a, url) {
   }
   else {
     bmt.expandUrl_longurl(bmt, a, url);
+  }
+}
+
+BetterMobileTwitter.prototype.expandUrl_twitvid = function(bmt, a, url) {
+  var res = url.match(/([a-zA-z0-9]+)$/);
+  if (res) {
+    bmt.expandUrl_image(a, url, 'http://images.twitvid.com/' + res[1] + '.jpg');
   }
 }
 
