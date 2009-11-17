@@ -27,120 +27,122 @@ Version history:
 1    27-Sep-2007    First release to userscripts.org
 */
 
-var GReaderUnreadCount = {
-  isChrome:false,
-  totaltext:'',
+(function(){
 
-  init:function() {
-    var enabled = true;
+var isChrome = false;
+var totaltext = '';
 
-    if (navigator.userAgent.match(/Chrome/)) {
-      enabled = document.location.href.match(/https?:\/\/www\.google\.com(\.[a-z]+)?\/reader\/view/)?true:false;
-      GReaderUnreadCount.isChrome = true;
-    }
+function init() {
+  var enabled = true;
 
-    if (enabled && document.body) GReaderUnreadCount.waitForReady();
-  },
-  // Wait for the dom ready
-  waitForReady:function() {
-    if (document.getElementById('reading-list-unread-count')) {
-      document.getElementById('reading-list-unread-count').addEventListener('DOMSubtreeModified', GReaderUnreadCount.modifySubtree, false);
-      window.addEventListener("DOMTitleChanged", GReaderUnreadCount.titleChanged, false);
-      window.setTimeout(GReaderUnreadCount.modifySubtree, 5000);
-      window.setInterval(GReaderUnreadCount.titleChanged, 3000);
-    }
-    else {
-      window.setTimeout(GReaderUnreadCount.waitForReady, 500);
-    }
-  },
+  if (navigator.userAgent.match(/Chrome/)) {
+    enabled = document.location.href.match(/https?:\/\/www\.google\.com(\.[a-z]+)?\/reader\/view/)?true:false;
+    isChrome = true;
+  }
 
+  if (enabled && document.body) waitForReady();
+}
 
-  modifySubtree:function() {
-    if (document.getElementById('reading-list-unread-count').textContent.match(/1000\+/)) {
-      GReaderUnreadCount.calcUnread();
-    }
-  },
+// Wait for the dom ready
+function waitForReady() {
+  if (document.getElementById('reading-list-unread-count')) {
+    document.getElementById('reading-list-unread-count').addEventListener('DOMSubtreeModified', modifySubtree, false);
+    window.addEventListener("DOMTitleChanged", titleChanged, false);
+    window.setTimeout(modifySubtree, 5000);
+    window.setInterval(titleChanged, 3000);
+  }
+  else {
+    window.setTimeout(waitForReady, 500);
+  }
+}
 
-  titleChanged:function() {
-    GReaderUnreadCount.calcUnread();
-    if (GReaderUnreadCount.totaltext) {
-      var newTitle = '(' + GReaderUnreadCount.totaltext + ') ' + document.title.replace(/\s*\(\d+\+?\)$/, '').replace(/^\(\d+\+?\)\s*/, '');;
-      if (document.title != newTitle) {
-        document.title = newTitle;
-      }
-    }
-  },
+function modifySubtree() {
+  if (document.getElementById('reading-list-unread-count').textContent.match(/1000\+/)) {
+    calcUnread();
+  }
+}
 
-  findItemUnread:function(checkDuplicated, item) {
-    var hasplus = false;
-    var count = 0;
-    var alreadyCounted = false;
-    var countres = item.innerHTML.match(/\((\d*)\+?\)/);
-    if (countres) {
-      count = parseInt(countres[1], 10);
-      if (item.innerHTML.match(/\(1000\+\)/)) {
-        hasplus = true;
-      }
-      var nodeTitle = item.parentNode.getAttribute('title');
-      if (nodeTitle) {
-        if (checkDuplicated.indexOf(nodeTitle) < 0) {
-          checkDuplicated.push(nodeTitle);
-        }
-        else {
-          alreadyCounted = true;
-        }
-      }
-    }
-
-    return {count:count,hasplus:hasplus,alreadyCounted:alreadyCounted};
-  },
-
-  calcUnread:function() {
-    var checkDuplicated = new Array();
-    var res = document.evaluate("//li[contains(@class, 'folder')]//li[contains(@class, 'folder')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-    var total = 0;
-    var totalplus = false;
-    for (var i=0;i<res.snapshotLength;i++) {
-      var res2 = document.evaluate(".//li[contains(@class, 'unread')]/a/span/span[contains(@class, 'unread-count')]", res.snapshotItem(i), null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-      var subtotal = 0;
-      var subtotalplus = false;
-      for (var j=0;j<res2.snapshotLength;j++) {
-        var result = GReaderUnreadCount.findItemUnread(checkDuplicated, res2.snapshotItem(j));
-        if (result.hasplus) {
-          totalplus = true;
-          subtotalplus = true;
-        }
-        subtotal += result.count;
-        if (!result.alreadyCounted) {
-          total += result.count;
-        }
-      }
-      if (subtotal > 0) {
-        var resfolder = document.evaluate(".//a/span/span[contains(@class, 'unread-count')]", res.snapshotItem(i), null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        if (resfolder) {
-          resfolder.innerHTML = '&nbsp;(' + subtotal + (subtotalplus?'+':'') + ')';
-        }
-      }
-    }
-
-    // untagged items
-    var res2 = document.evaluate("//ul[@id='sub-tree']/li/ul/li[not(contains(@class, 'folder')) and contains(@class, 'unread')]/a/span/span[contains(@class, 'unread-count')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-    for (var j=0;j<res2.snapshotLength;j++) {
-      var result = GReaderUnreadCount.findItemUnread(checkDuplicated, res2.snapshotItem(j));
-      if (result.hasplus) {
-        totalplus = true;
-      }
-      if (!result.alreadyCounted) {
-        total += result.count;
-      }
-    }
-
-    //alert(total + (totalplus?'+':''));
-    if (total > 0) {
-      GReaderUnreadCount.totaltext = total + (totalplus?'+':'');
-      document.getElementById('reading-list-unread-count').innerHTML = ' (' + GReaderUnreadCount.totaltext + ')';
+function titleChanged() {
+  calcUnread();
+  if (totaltext) {
+    var newTitle = '(' + totaltext + ') ' + document.title.replace(/\s*\(\d+\+?\)$/, '').replace(/^\(\d+\+?\)\s*/, '');;
+    if (document.title != newTitle) {
+      document.title = newTitle;
     }
   }
 }
 
-GReaderUnreadCount.init();
+function findItemUnread(checkDuplicated, item) {
+  var hasplus = false;
+  var count = 0;
+  var alreadyCounted = false;
+  var countres = item.innerHTML.match(/\((\d*)\+?\)/);
+  if (countres) {
+    count = parseInt(countres[1], 10);
+    if (item.innerHTML.match(/\(1000\+\)/)) {
+      hasplus = true;
+    }
+    var nodeTitle = item.parentNode.getAttribute('title');
+    if (nodeTitle) {
+      if (checkDuplicated.indexOf(nodeTitle) < 0) {
+        checkDuplicated.push(nodeTitle);
+      }
+      else {
+        alreadyCounted = true;
+      }
+    }
+  }
+
+  return {count:count,hasplus:hasplus,alreadyCounted:alreadyCounted};
+}
+
+function calcUnread() {
+  var checkDuplicated = new Array();
+  var res = document.evaluate("//li[contains(@class, 'folder')]//li[contains(@class, 'folder')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  var total = 0;
+  var totalplus = false;
+  for (var i=0;i<res.snapshotLength;i++) {
+    var res2 = document.evaluate(".//li[contains(@class, 'unread')]/a/span/span[contains(@class, 'unread-count')]", res.snapshotItem(i), null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+    var subtotal = 0;
+    var subtotalplus = false;
+    for (var j=0;j<res2.snapshotLength;j++) {
+      var result = findItemUnread(checkDuplicated, res2.snapshotItem(j));
+      if (result.hasplus) {
+        totalplus = true;
+        subtotalplus = true;
+      }
+      subtotal += result.count;
+      if (!result.alreadyCounted) {
+        total += result.count;
+      }
+    }
+    if (subtotal > 0) {
+      var resfolder = document.evaluate(".//a/span/span[contains(@class, 'unread-count')]", res.snapshotItem(i), null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      if (resfolder) {
+        resfolder.innerHTML = '&nbsp;(' + subtotal + (subtotalplus?'+':'') + ')';
+      }
+    }
+  }
+
+  // untagged items
+  var res2 = document.evaluate("//ul[@id='sub-tree']/li/ul/li[not(contains(@class, 'folder')) and contains(@class, 'unread')]/a/span/span[contains(@class, 'unread-count')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (var j=0;j<res2.snapshotLength;j++) {
+    var result = findItemUnread(checkDuplicated, res2.snapshotItem(j));
+    if (result.hasplus) {
+      totalplus = true;
+    }
+    if (!result.alreadyCounted) {
+      total += result.count;
+    }
+  }
+
+  //alert(total + (totalplus?'+':''));
+  if (total > 0) {
+    totaltext = total + (totalplus?'+':'');
+    document.getElementById('reading-list-unread-count').innerHTML = ' (' + totaltext + ')';
+  }
+}
+
+init();
+
+})();
