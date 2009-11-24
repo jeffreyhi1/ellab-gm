@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Google Reader Unread Count
-// @version         8
+// @version         9
 // @namespace       http://ellab.org/
 // @author          angusdev
 // @description     Display actual unread count instead of "1000+" in Google Reader
@@ -29,15 +29,14 @@ Version history:
 
 (function(){
 
-var isChrome = false;
 var totaltext = '';
+var unreadCountElement = null;
 
 function init() {
   var enabled = true;
 
   if (navigator.userAgent.match(/Chrome/)) {
     enabled = document.location.href.match(/https?:\/\/www\.google\.com(\.[a-z]+)?\/reader\/view/)?true:false;
-    isChrome = true;
   }
 
   if (enabled && document.body) waitForReady();
@@ -45,8 +44,8 @@ function init() {
 
 // Wait for the dom ready
 function waitForReady() {
-  if (document.getElementById('reading-list-unread-count')) {
-    document.getElementById('reading-list-unread-count').addEventListener('DOMSubtreeModified', modifySubtree, false);
+  if (unreadCountElement = document.getElementById('reading-list-unread-count')) {
+    unreadCountElement.addEventListener('DOMSubtreeModified', modifySubtree, false);
     window.addEventListener("DOMTitleChanged", titleChanged, false);
     window.setTimeout(modifySubtree, 5000);
     window.setInterval(titleChanged, 3000);
@@ -57,7 +56,7 @@ function waitForReady() {
 }
 
 function modifySubtree() {
-  if (document.getElementById('reading-list-unread-count').textContent.match(/1000\+/)) {
+  if (unreadCountElement.textContent.match(/1000\+/)) {
     calcUnread();
   }
 }
@@ -97,10 +96,10 @@ function findItemUnread(checkDuplicated, item) {
 }
 
 function calcUnread() {
-  var checkDuplicated = new Array();
-  var res = document.evaluate("//li[contains(@class, 'folder')]//li[contains(@class, 'folder')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  var checkDuplicated = [];
   var total = 0;
   var totalplus = false;
+  var res = document.evaluate("//li[contains(@class, 'folder')]//li[contains(@class, 'folder')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
   for (var i=0;i<res.snapshotLength;i++) {
     var res2 = document.evaluate(".//li[contains(@class, 'unread')]/a/span/span[contains(@class, 'unread-count')]", res.snapshotItem(i), null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
     var subtotal = 0;
@@ -136,10 +135,9 @@ function calcUnread() {
     }
   }
 
-  //alert(total + (totalplus?'+':''));
   if (total > 0) {
     totaltext = total + (totalplus?'+':'');
-    document.getElementById('reading-list-unread-count').innerHTML = ' (' + totaltext + ')';
+    unreadCountElement.innerHTML = ' (' + totaltext + ')';
   }
 }
 
