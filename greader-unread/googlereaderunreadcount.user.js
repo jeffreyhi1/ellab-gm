@@ -11,9 +11,10 @@
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2009-10-24
+Date:   2009-11-25
 
 Version history:
+9    25-Nov-2009    Refactoring and optimization
 8    24-Oct-2009    Issue #1 The node no longer has feed url, so use the node title as duplication check
 7    02-Oct-2009    Supports Chrome extensions
 6    14-May-2009    @include uses top-level-domain (tld) conversion
@@ -29,7 +30,7 @@ Version history:
 
 (function(){
 
-var totaltext = '';
+var isChrome = false;
 var unreadCountElement = null;
 
 function init() {
@@ -37,6 +38,7 @@ function init() {
 
   if (navigator.userAgent.match(/Chrome/)) {
     enabled = document.location.href.match(/https?:\/\/www\.google\.com(\.[a-z]+)?\/reader\/view/)?true:false;
+    isChrome = true;
   }
 
   if (enabled && document.body) waitForReady();
@@ -45,10 +47,12 @@ function init() {
 // Wait for the dom ready
 function waitForReady() {
   if (unreadCountElement = document.getElementById('reading-list-unread-count')) {
-    unreadCountElement.addEventListener('DOMSubtreeModified', modifySubtree, false);
-    window.addEventListener("DOMTitleChanged", titleChanged, false);
-    window.setTimeout(modifySubtree, 5000);
-    window.setInterval(titleChanged, 3000);
+    if (!isChrome) {
+      unreadCountElement.addEventListener('DOMSubtreeModified', modifySubtree, false);
+      window.addEventListener("DOMTitleChanged", calcUnread, false);
+    }
+    calcUnread();
+    window.setInterval(calcUnread, 3000);
   }
   else {
     window.setTimeout(waitForReady, 500);
@@ -58,16 +62,6 @@ function waitForReady() {
 function modifySubtree() {
   if (unreadCountElement.textContent.match(/1000\+/)) {
     calcUnread();
-  }
-}
-
-function titleChanged() {
-  calcUnread();
-  if (totaltext) {
-    var newTitle = '(' + totaltext + ') ' + document.title.replace(/\s*\(\d+\+?\)$/, '').replace(/^\(\d+\+?\)\s*/, '');;
-    if (document.title != newTitle) {
-      document.title = newTitle;
-    }
   }
 }
 
@@ -136,8 +130,16 @@ function calcUnread() {
   }
 
   if (total > 0) {
-    totaltext = total + (totalplus?'+':'');
+    var totaltext = total + (totalplus?'+':'');
     unreadCountElement.innerHTML = ' (' + totaltext + ')';
+
+    // update windows title as well
+    if (totaltext) {
+      var newTitle = '(' + totaltext + ') ' + document.title.replace(/\s*\(\d+\+?\)$/, '').replace(/^\(\d+\+?\)\s*/, '');;
+      if (document.title != newTitle) {
+        document.title = newTitle;
+      }
+    }
   }
 }
 
