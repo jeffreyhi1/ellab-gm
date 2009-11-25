@@ -15,6 +15,7 @@ Date:   2009-11-25
 
 Version history:
 9    25-Nov-2009    Refactoring and optimization
+                    Now will listen to each feed's unread count change and recalculate
 8    24-Oct-2009    Issue #1 The node no longer has feed url, so use the node title as duplication check
 7    02-Oct-2009    Supports Chrome extensions
 6    14-May-2009    @include uses top-level-domain (tld) conversion
@@ -47,12 +48,17 @@ function init() {
 // Wait for the dom ready
 function waitForReady() {
   if (unreadCountElement = document.getElementById('reading-list-unread-count')) {
-    if (!isChrome) {
-      unreadCountElement.addEventListener('DOMSubtreeModified', modifySubtree, false);
+    if (isChrome) {
+      window.setInterval(calcUnread, 3000);
+    }
+    else {
+      var res = document.evaluate("//span[contains(@class, 'unread-count') and contains(@class, 'sub-unread-count') and not(contains(@class, 'folder-unread-count'))]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+      for (var i=0;i<res.snapshotLength;i++) {
+        res.snapshotItem(i).parentNode.addEventListener('DOMSubtreeModified', modifySubtree, false);
+      }
       window.addEventListener("DOMTitleChanged", calcUnread, false);
     }
     calcUnread();
-    window.setInterval(calcUnread, 3000);
   }
   else {
     window.setTimeout(waitForReady, 500);
@@ -60,7 +66,7 @@ function waitForReady() {
 }
 
 function modifySubtree() {
-  if (unreadCountElement.textContent.match(/1000\+/)) {
+  if (unreadCountElement.textContent.match(/\d{4}\+?/)) {
     calcUnread();
   }
 }
