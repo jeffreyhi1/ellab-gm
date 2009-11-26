@@ -18,6 +18,8 @@ Version history:
 1    02-May-2008    Initial release
 */
 
+(function(){
+
 var dataset = new Array();
 var FILTERS = [
   {id:'brand',     name:'Brand'      },
@@ -251,3 +253,5 @@ for (var i=0;i<FILTERS.length;i++) {
 td.width = '100%';
 document.getElementById('Table4').rows[0].cells[0].getElementsByTagName('img')[0].height = '124';
 document.getElementById('Table4').rows[0].cells[2].getElementsByTagName('img')[0].height = '124';
+
+})();
