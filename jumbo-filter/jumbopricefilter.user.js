@@ -1,13 +1,10 @@
 // ==UserScript==
 // @name           Jumbo Price Filter
 // @namespace      http://ellab.org/
-// @version        1.0
+// @version        2
 // @description    Add filters in hardware price list in jumbo-computer.com
 // @include        http://www.jumbo-computer.com/pricelist.asp
 // ==/UserScript==
-
-// Licensed under GNU General Public License v2
-// http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 var dataset = new Array();
 var FILTERS = [
@@ -17,7 +14,7 @@ var FILTERS = [
   {id:'interface', name:'Interface'  },
   {id:'size',      name:'Size',      sort:sortFloat },
   {id:'vgachip',   name:'Modal'      },
-  {id:'capacity',   name:'Capacity',   sort:sortMemory }
+  {id:'capacity',  name:'Capacity',  sort:sortMemory }
 ];
 // init the set
 for (var i=0;i<FILTERS.length;i++) {
@@ -178,7 +175,7 @@ function getAttribute(type, name) {
   if (brand) {
     brand = brand[1];
     // some memory use size at the beginning of the product name
-    if (!brand.match(/^\d+[M|G|T]B/)) {
+    if (!brand.match(/^[\d\.]+[M|G|T]B?$/)) {
       attr.brand = brand;
     }
   }
