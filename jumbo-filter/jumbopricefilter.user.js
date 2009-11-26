@@ -13,7 +13,7 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2009-11-26
 
 Version history:
-2    26-Nov-2009    Add support of 2HD, 3HD, CHD and NAS
+2    26-Nov-2009    Add support of 2HD, 3HD, CHD, HDC and NAS
                     Fix the bug that will treat 40G, 37.2GB as brand name
 1    02-May-2008    Initial release
 */
@@ -202,7 +202,7 @@ function getAttribute(type, name) {
     var size = name.match(/(\d*\.?\d*")/);
     if (size) {
       attr.size = size[1];
-      if (type != 'HDD') {
+      if (type == 'LCD') {
         attr.size = attr.size.replace(/\.\d+([^\d])/, '$1');
       }
     }
