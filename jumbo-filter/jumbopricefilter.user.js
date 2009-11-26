@@ -1,10 +1,22 @@
 // ==UserScript==
 // @name           Jumbo Price Filter
-// @namespace      http://ellab.org/
 // @version        2
+// @namespace      http://ellab.org/
 // @description    Add filters in hardware price list in jumbo-computer.com
+// @include        http://jumbo-computer.com/pricelist.asp
 // @include        http://www.jumbo-computer.com/pricelist.asp
 // ==/UserScript==
+
+/*
+Author: Angus http://angusdev.mysinablog.com/
+              http://angusdev.blogspot.com/
+Date:   2009-11-26
+
+Version history:
+2    26-Nov-2009    Add support of 2HD, 3HD, CHD and NAS
+                    Fix the bug that will treat 40G, 37.2GB as brand name
+1    02-May-2008    Initial release
+*/
 
 var dataset = new Array();
 var FILTERS = [
@@ -109,7 +121,7 @@ function getAttribute(type, name) {
     if (vgachip) attr.vgachip = vgachip[1];
   }
 
-  if (type == 'RAM' || type == 'HDD' || type == 'MAS') {
+  if (type == 'RAM' || type == 'HDD' || type == '2HD' || type == '3HD' || type == 'CHD' || type == 'MAS' || type == 'NAS') {
     var capacity = name.match(/([\d\.]+[M|G|T]B)/);
     if (capacity) {
       capacity = capacity[1];
@@ -120,6 +132,7 @@ function getAttribute(type, name) {
       }
     }
   }
+
   if (type == 'MIS') {
     // Micro Storage starts with [Card Type]
     if (category) {
@@ -135,6 +148,7 @@ function getAttribute(type, name) {
         ))))));
     }
   }
+
   if (type == 'RAM') {
     // Some RAM starts with [Device]
     attr.device =
@@ -143,6 +157,7 @@ function getAttribute(type, name) {
       (category?category:'Desktop'
       ));
   }
+
   if (type == 'HDD') {
     // Some HDD starts with [Device]
     attr.device =
@@ -152,6 +167,7 @@ function getAttribute(type, name) {
       (category?category:'Desktop'
       )));
   }
+
   if (type == 'MIS') {
     var capacity = name.match(/([\d]+[M|G|T]B?)/);
     if (capacity) {
@@ -180,11 +196,13 @@ function getAttribute(type, name) {
     }
   }
 
-  var size = name.match(/(\d*\.?\d*")/);
-  if (size) {
-    attr.size = size[1];
-    if (type != 'HDD') {
-      attr.size = attr.size.replace(/\.\d+([^\d])/, '$1');
+  if (type != '2HD' && type != '3HD' && type != 'CHD') {
+    var size = name.match(/(\d*\.?\d*")/);
+    if (size) {
+      attr.size = size[1];
+      if (type != 'HDD') {
+        attr.size = attr.size.replace(/\.\d+([^\d])/, '$1');
+      }
     }
   }
 
