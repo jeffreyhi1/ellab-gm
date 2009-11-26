@@ -14,6 +14,7 @@ Date:   2009-11-26
 
 Version history:
 2    26-Nov-2009    Add support of 2HD, 3HD, CHD, HDC and NAS
+                    Add speed filter for CDR and DVD
                     Fix the bug that will treat 40G, 37.2GB as brand name
 1    02-May-2008    Initial release
 */
@@ -28,6 +29,7 @@ var FILTERS = [
   {id:'interface', name:'Interface'  },
   {id:'size',      name:'Size',      sort:sortFloat },
   {id:'vgachip',   name:'Modal'      },
+  {id:'speed',     name:'Speed',     sort:sortFloat },
   {id:'capacity',  name:'Capacity',  sort:sortMemory }
 ];
 // init the set
@@ -205,6 +207,13 @@ function getAttribute(type, name) {
       if (type == 'LCD') {
         attr.size = attr.size.replace(/\.\d+([^\d])/, '$1');
       }
+    }
+  }
+
+  if (type == 'CDR' || type == 'DVD') {
+    var speed = name.match(/\s(\d+X)\s/);
+    if (speed) {
+      attr.speed = speed[1];
     }
   }
 
