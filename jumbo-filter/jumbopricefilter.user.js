@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Jumbo Price Filter
-// @version        2
+// @version        3
 // @namespace      http://ellab.org/
 // @description    Add filters in hardware price list in jumbo-computer.com
 // @include        http://jumbo-computer.com/pricelist.asp
@@ -13,6 +13,7 @@ Author: Angus http://angusdev.mysinablog.com/
 Date:   2009-11-26
 
 Version history:
+3    TBD            Issue #6 Fix the bug that do not recognize 2G, 4G as capacity (in ram)
 2    26-Nov-2009    Add support of 2HD, 3HD, CHD, HDC and NAS
                     Add speed filter for CDR and DVD
                     Fix the bug that will treat 40G, 37.2GB as brand name
@@ -126,9 +127,9 @@ function getAttribute(type, name) {
   }
 
   if (type == 'RAM' || type == 'HDD' || type == '2HD' || type == '3HD' || type == 'CHD' || type == 'MAS' || type == 'NAS') {
-    var capacity = name.match(/([\d\.]+[M|G|T]B)/);
+    var capacity = name.match(/([\d\.]+[M|G|T])[B\s]/);
     if (capacity) {
-      capacity = capacity[1];
+      capacity = capacity[1] + 'B';
       // check at least 128MB
       if ((!capacity.match(/MB$/) || parseInt(capacity, 10) >= 128)) {
         // remove the .0
