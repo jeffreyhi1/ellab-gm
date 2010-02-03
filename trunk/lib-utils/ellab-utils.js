@@ -112,5 +112,52 @@ org.ellab.utils.setSession = function(name, value) {
   }
 }
 
+org.ellab.utils.getResourceURL = function(name, file) {
+  if (typeof GM_getResourceURL != 'undefined') {
+    return GM_getResourceURL(name);
+  }
+  else if (typeof chrome != 'undefined' && typeof chrome.extension != 'undefined' && typeof chrome.extension.getURL != 'undefined') {
+    return chrome.extension.getURL(file);
+  }
+  else {
+    return file;
+  }
+}
+
+org.ellab.utils.calcOffsetTop = function(node) {
+  var top = 0;
+  do {
+    if (!isNaN(node.offsetTop)) top += node.offsetTop;
+  } while (node = node.offsetParent);
+
+  return top;
+}
+
+org.ellab.utils.calcOffsetLeft = function(node) {
+  var left = 0;
+  do {
+    if (!isNaN(node.offsetLeft)) left += node.offsetLeft;
+  } while (node = node.offsetParent);
+
+  return left;
+}
+
+org.ellab.utils.getElementsByClassName = function(className, node) {
+  if (!className) {
+    return [];
+  }
+  node = node || document;
+  if (node.getElementsByClassName) {
+    return node.getElementsByClassName(className);
+  }
+  else {
+    var res = document.evaluate(".//*[contains(concat(' ', @class, ' '), ' " + className + " ')]", node, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+    var result = [];
+    for (var i=0;i<res.snapshotLength;i++) {
+      result.push(res.snapshotItem(i));
+    }
+    return result;
+  }
+}
 
 })();
