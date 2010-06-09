@@ -1,0 +1,14 @@
+{
+  "name": "Google Reader Unread Count",
+  "version": "10",
+  "description": "Display actual unread count instead of '1000+' in Google Reader.",
+  "content_scripts": [
+    {
+      "matches": ["http://www.google.com/reader/*", "https://www.google.com/reader/*"],
+      "js": ["googlereaderunreadcount.user.js"]
+    }
+  ],
+  "icons": {
+    "128": "icon-128.png"
+  }
+}
