@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Google Reader Unread Count
-// @version         9
+// @version         10
 // @namespace       http://ellab.org/
 // @author          angusdev
 // @description     Display actual unread count instead of "1000+" in Google Reader
@@ -11,9 +11,10 @@
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2009-11-25
+Date:   2010-06-09
 
 Version history:
+10   09-Jun-2010    Issue #14 Suppport Safari Extensions
 9    25-Nov-2009    Refactoring and optimization
                     Now will listen to each feed's unread count change and recalculate
 8    24-Oct-2009    Issue #1 The node no longer has feed url, so use the node title as duplication check
@@ -32,31 +33,38 @@ Version history:
 (function(){
 
 var isChrome = false;
+var isSafari = false;
+
+// features switch
+var hasDOMSubtreeModified = false;
+
 var unreadCountElement = null;
 
 function init() {
-  var enabled = true;
-
   if (navigator.userAgent.match(/Chrome/)) {
-    enabled = document.location.href.match(/https?:\/\/www\.google\.com(\.[a-z]+)?\/reader\/view/)?true:false;
     isChrome = true;
   }
+  else if (navigator.userAgent.match(/Safari/)) {
+    isSafari = true;
+  }
+  
+  hasDOMSubtreeModified = !isChrome && !isSafari;
 
-  if (enabled && document.body) waitForReady();
+  if (document.body) waitForReady();
 }
 
 // Wait for the dom ready
 function waitForReady() {
   if (unreadCountElement = document.getElementById('reading-list-unread-count')) {
-    if (isChrome) {
-      window.setInterval(calcUnread, 3000);
-    }
-    else {
+    if (hasDOMSubtreeModified) {
       var res = document.evaluate("//span[contains(@class, 'unread-count') and contains(@class, 'sub-unread-count') and not(contains(@class, 'folder-unread-count'))]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
       for (var i=0;i<res.snapshotLength;i++) {
         res.snapshotItem(i).parentNode.addEventListener('DOMSubtreeModified', modifySubtree, false);
       }
       window.addEventListener("DOMTitleChanged", calcUnread, false);
+    }
+    else {
+      window.setInterval(calcUnread, 3000);
     }
     calcUnread();
   }
