@@ -160,4 +160,20 @@ org.ellab.utils.getElementsByClassName = function(className, node) {
   }
 }
 
+org.ellab.utils.decodeHTML = function(s) {
+  s = s.replace('&gt;', '>', 'g');
+  s = s.replace('&lt;', '<', 'g');
+  s = s.replace('&quot;', '"', 'g');
+  s = s.replace('&amp;', '&', 'g');
+  return s;
+}
+
+org.ellab.utils.encodeHTML = function(s) {
+  s = s.replace('&', '&amp;', 'g');
+  s = s.replace('>', '&gt;', 'g');
+  s = s.replace('<', '&lt;', 'g');
+  s = s.replace('"', '&quot;', 'g');
+  return s;
+}
+
 })();
