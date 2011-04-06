@@ -11,10 +11,12 @@
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2009-11-25
+Date:   2011-04-06
 
-Version  3  25-Nov-2009    Supports Apple Action News as well
-                           Fix Issue #5 now get the large photo url properly
+Version  3  06-Apr-2011    Supports Apple Action News as well
+                           Issue #5 Image link broken if large photo's file name is diff from small photo
+                           Issue #26 Not working in Chrome 12
+                           Issue #27 Solve the conflict of AdBlockPlus for Chrome
 Version  2  06-Oct-2009    Fix as atnext changed html
 Version  1  30-Apr-2009    First release
 */
