@@ -1,13 +1,20 @@
-// ==UserScript==
+ï»¿// ==UserScript==
 // @name           Appledaily Large Photo Viewer
 // @namespace      http://ellab.org/
-// @version        2
+// @version        3
 // @author         angusdev
-// @description    Ä«ªG¤é³ø¤Î³ü¶Ç´C§ïª©«á¥Î Flash ¨ÓÅã¥Ü©ñ¤j¹Ï¤ù¡A¤£§Q¤j®aÀx¦s©MÂà¸ü¡C³o­Ó script ·|¦bª©­±¼W¥[¤@­Ó¹Ï¥Ü«ü¦V¯u¥¿ªº¤j¹Ï¤ù¡C
+// @description    è˜‹æœæ—¥å ±åŠå£¹å‚³åª’æ”¹ç‰ˆå¾Œç”¨ Flash ä¾†é¡¯ç¤ºæ”¾å¤§åœ–ç‰‡ï¼Œä¸åˆ©å¤§å®¶å„²å­˜å’Œè½‰è¼‰ã€‚é€™å€‹ script æœƒåœ¨ç‰ˆé¢å¢åŠ ä¸€å€‹åœ–ç¤ºæŒ‡å‘çœŸæ­£çš„å¤§åœ–ç‰‡ã€‚
 // @include        http://*.nextmedia.com/template/*
+// @include        http://*.nextmedia.com/realtime/*
 // ==/UserScript==
 
 /*
+Author: Angus http://angusdev.mysinablog.com/
+              http://angusdev.blogspot.com/
+Date:   2009-11-25
+
+Version  3  25-Nov-2009    Supports Apple Action News as well
+                           Fix Issue #5 now get the large photo url properly
 Version  2  06-Oct-2009    Fix as atnext changed html
 Version  1  30-Apr-2009    First release
 */
@@ -19,35 +26,36 @@ var ICON = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAA
 function makeButton(imglink) {
   var newspan = document.createElement('span');
   newspan.className = 'photoEnlarge';
-  newspan.innerHTML = '<a href="' + imglink + '" target="_blank" style="margin:5px 5px 0px 0px; background-image:url(' + ICON  + ');">©ñ¤j¹Ï¤ù</a>';
+  newspan.innerHTML = '<a href="' + imglink + '" target="_blank" style="margin:5px 5px 0px 0px; background-image:url(' + ICON  + ');">æ”¾å¤§åœ–ç‰‡</a>';
 
   return newspan;
 }
 
 var articleIntroPhotoBox = document.getElementById('articleIntroPhotoBox');
 if (articleIntroPhotoBox) {
-  var intro_photo_img = document.getElementById('intro_photo_img');
-  if (intro_photo_img) {
-    var origButtonSpan = articleIntroPhotoBox.getElementsByTagName('SPAN')[0];
-    origButtonSpan.parentNode.insertBefore(makeButton(intro_photo_img.src.replace(/\/small\//, '/large/')), origButtonSpan);
+  var articleIntroPhoto = document.getElementById('articleIntroPhoto');
+  if (articleIntroPhoto) {
+    var imgSrc = articleIntroPhoto.getElementsByTagName('noscript');
+    if (imgSrc) {
+      imgSrc = imgSrc[0].textContent.match(/href="([^\"]*)"/);
+      if (imgSrc) {
+        imgSrc = imgSrc[1];
+        var origButtonSpan = articleIntroPhotoBox.getElementsByTagName('SPAN')[0];
+        origButtonSpan.parentNode.insertBefore(makeButton(imgSrc), origButtonSpan);
+      }
+    }
   }
 }
 
 var res = document.evaluate("//span[@class='photoEnlarge']/a", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
 for (var i=0;i<res.snapshotLength;i++) {
-  var modified = false;
-
   var ele = res.snapshotItem(i);
-
-  if (!modified && ele.href.match(/javascript:photoviewer/) && ele.href.match(/\/large\//)) {
+  if (ele.href.match(/javascript:photoviewer/) && ele.href.match(/\/large\//)) {
     var imglink = ele.href.match(/javascript:photoviewer\(\'([^\']+)\'/);
-    console.log(ele.href);
-     console.log(imglink);
     if (imglink) {
       imglink = imglink[1];
       var span = ele.parentNode;
       span.parentNode.insertBefore(makeButton(imglink), span);
-      modified = true;
     }
   }
 }
