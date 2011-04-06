@@ -60,4 +60,12 @@ for (var i=0;i<res.snapshotLength;i++) {
   }
 }
 
+// fix the disappear image problem with Chrome + AdBlockPlus
+var res = document.evaluate("//div[@class='articlePhotoBoxPhoto']//img[contains(@style, 'height: 0px; width: 0px;')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+for (var i=0; i<res.snapshotLength; i++) {
+  var ele = res.snapshotItem(i);
+  ele.style.width = '';
+  ele.style.height = '';
+}
+
 })();
