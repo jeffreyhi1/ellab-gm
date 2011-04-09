@@ -1,0 +1,16 @@
+﻿{
+  "name": "Appledaily Large Photo Viewer",
+  "version": "3",
+  "description": "蘋果日報及壹傳媒改版後用 Flash 來顯示放大圖片，不利大家儲存和轉載。這個 extension 會在版面增加一個圖示指向真正的大圖片。",
+  "content_scripts": [
+    {
+      "matches": ["http://*.nextmedia.com/template/*", "http://*.nextmedia.com/realtime/*"],
+      "js": ["appledailylargephotoviewer.user.js"]
+    }
+  ],
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}
