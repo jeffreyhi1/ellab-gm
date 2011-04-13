@@ -55,7 +55,7 @@ org.ellab.utils.crossOriginXMLHttpRequest_GM = function(params) {
 org.ellab.utils.crossOriginXMLHttpRequest_Chrome = function(params) {
   params.onComplete = function(status, data) {
     if (status == 200) {
-      var response = {responseText:data};
+      var response = {status:status, responseText:data};
       if (params.onload) {
         params.onload.call(this, response);
       }
@@ -174,6 +174,15 @@ org.ellab.utils.encodeHTML = function(s) {
   s = s.replace('<', '&lt;', 'g');
   s = s.replace('"', '&quot;', 'g');
   return s;
+}
+
+org.ellab.utils.jsonParse = function(s) {
+  if (typeof(JSON) != 'undefined' && JSON.parse) {
+    return JSON.parse(s);
+  }
+  else {
+    return eval(s);
+  }
 }
 
 })();
