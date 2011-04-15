@@ -142,6 +142,14 @@ org.ellab.utils.calcOffsetLeft = function(node) {
   return left;
 }
 
+org.ellab.utils.xpath = function(xpath, ele) {
+  return document.evaluate(xpath, ele?ele:document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+}
+
+org.ellab.utils.xpathl = function(xpath, ele) {
+  return document.evaluate(xpath, ele?ele:document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+}
+
 org.ellab.utils.getElementsByClassName = function(className, node) {
   if (!className) {
     return [];
