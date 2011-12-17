@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -11,9 +11,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>11</string>
+	<string>12</string>
 	<key>CFBundleVersion</key>
-	<string>11</string>
+	<string>12</string>
 	<key>Chrome</key>
 	<dict/>
 	<key>Content</key>
@@ -28,6 +28,7 @@
 		<key>Whitelist</key>
 		<array>
 			<string>http://www.google.com/reader/*</string>
+			<string>https://www.google.com/reader/*</string>
 		</array>
 	</dict>
 	<key>Description</key>
