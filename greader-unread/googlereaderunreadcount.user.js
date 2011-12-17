@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            Google Reader Unread Count
-// @version         11
+// @version         12
 // @namespace       http://ellab.org/
 // @author          angusdev
 // @description     Display actual unread count instead of "1000+" in Google Reader
@@ -11,9 +11,11 @@
 /*
 Author: Angus http://angusdev.mysinablog.com/
               http://angusdev.blogspot.com/
-Date:   2011-11-06
+Date:   2011-12-18
 
 Version history:
+12   18-Dec-2011    Issue #34 Refine the matches URL
+                    Issue #35 Double count if a feed is in more than 1 tag
 11   06-Nov-2011    Issue #32 Fix the problem on Google new version
 10   09-Jun-2010    Issue #14 Suppport Safari Extensions
 9    25-Nov-2009    Refactoring and optimization
@@ -48,7 +50,7 @@ function init() {
   else if (navigator.userAgent.match(/Safari/)) {
     isSafari = true;
   }
-  
+
   hasDOMSubtreeModified = !isChrome && !isSafari;
 
   if (document.body) waitForReady();
@@ -90,10 +92,10 @@ function findItemUnread(checkDuplicated, item) {
     if (item.innerHTML.match(/\(1000\+\)/)) {
       hasplus = true;
     }
-    var nodeTitle = item.parentNode.getAttribute('title');
-    if (nodeTitle) {
-      if (checkDuplicated.indexOf(nodeTitle) < 0) {
-        checkDuplicated.push(nodeTitle);
+    var nodeHref = item.parentNode.getAttribute('href');
+    if (nodeHref) {
+      if (checkDuplicated.indexOf(nodeHref) < 0) {
+        checkDuplicated.push(nodeHref);
       }
       else {
         alreadyCounted = true;
