@@ -14,7 +14,7 @@ function registerNS(ns) {
 
 registerNS("org.ellab.utils");
 
-org.ellab.utils.isChrome = navigator.userAgent.match(/Chrome/)?true:false;
+org.ellab.utils.isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
 
 org.ellab.utils.extract = function(s, prefix, suffix) {
   var i = s.indexOf(prefix);
@@ -52,16 +52,24 @@ org.ellab.utils.crossOriginXMLHttpRequest_GM = function(params) {
   });
 };
 
+// method
+// url
+// onload
 org.ellab.utils.crossOriginXMLHttpRequest_Chrome = function(params) {
-  params.onComplete = function(status, data) {
-    if (status == 200) {
-      var response = {status:status, responseText:data};
-      if (params.onload) {
-        params.onload.call(this, response);
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4) {
+      if (xhr.status == 200) {
+        var response = {status:xhr.status, responseText:xhr.responseText};
+        if (params.onload) {
+          params.onload.call(this, response);
+        }
       }
     }
   };
-  proxyXHR(params);
+
+  xhr.open(params.method, params.url, true);
+  xhr.send();
 };
 
 org.ellab.utils.crossOriginXMLHttpRequest = function(params) {
