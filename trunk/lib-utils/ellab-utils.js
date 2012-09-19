@@ -177,6 +177,7 @@ org.ellab.utils.getElementsByClassName = function(className, node) {
 }
 
 org.ellab.utils.decodeHTML = function(s) {
+  if (!s) return s;
   s = s.replace('&gt;', '>', 'g');
   s = s.replace('&lt;', '<', 'g');
   s = s.replace('&quot;', '"', 'g');
@@ -185,6 +186,7 @@ org.ellab.utils.decodeHTML = function(s) {
 }
 
 org.ellab.utils.encodeHTML = function(s) {
+  if (!s) return s;
   s = s.replace('&', '&amp;', 'g');
   s = s.replace('>', '&gt;', 'g');
   s = s.replace('<', '&lt;', 'g');
