@@ -48,6 +48,7 @@ org.ellab.utils.trim = function(s) {
 }
 
 org.ellab.utils.extract = function(s, prefix, suffix) {
+  if (prefix) {
     var i = s.indexOf(prefix);
     if (i >= 0) {
       s = s.substring(i + prefix.length);
@@ -55,8 +56,10 @@ org.ellab.utils.extract = function(s, prefix, suffix) {
     else {
       return '';
     }
+  }
+
   if (suffix) {
-    i = s.indexOf(suffix);
+    var i = s.indexOf(suffix);
     if (i >= 0) {
       s = s.substring(0, i);
     }
@@ -64,6 +67,7 @@ org.ellab.utils.extract = function(s, prefix, suffix) {
       return '';
     }
   }
+
   return s;
 };
 
@@ -279,20 +283,22 @@ org.ellab.utils.getElementsByClassName = function(className, node) {
 }
 
 org.ellab.utils.decodeHTML = function(s) {
-  if (!s) return s;
+  if (s) {
     s = s.replace('&gt;', '>', 'g');
     s = s.replace('&lt;', '<', 'g');
     s = s.replace('&quot;', '"', 'g');
     s = s.replace('&amp;', '&', 'g');
+  }
   return s;
 }
 
 org.ellab.utils.encodeHTML = function(s) {
-  if (!s) return s;
+  if (s) {
     s = s.replace('&', '&amp;', 'g');
     s = s.replace('>', '&gt;', 'g');
     s = s.replace('<', '&lt;', 'g');
     s = s.replace('"', '&quot;', 'g');
+  }
   return s;
 }
 
