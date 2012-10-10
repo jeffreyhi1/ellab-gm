@@ -16,6 +16,37 @@ registerNS("org.ellab.utils");
 
 org.ellab.utils.isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
 
+if (XPathResult.prototype.each == null) {
+  XPathResult.prototype.each = function(callback, args) {
+    var i = 0;
+    var length = this.snapshotLength;
+    if (length === undefined) {
+      return this;
+    }
+
+    if (args) {
+      for (; i < length;) {
+        if (callback.apply(this.snapshotItem(i++), args) === false) {
+          break;
+        }
+      }
+    }
+    else {
+      for (; i < length;) {
+        if (callback.call(this.snapshotItem(i), i, this.snapshotItem(i++)) === false) {
+          break;
+        }
+      }
+    }
+
+    return this;
+  }
+}
+
+org.ellab.utils.trim = function(s) {
+  return (s || '').replace(/^\s+/, '').replace(/\s+$/, '');
+}
+
 org.ellab.utils.extract = function(s, prefix, suffix) {
     var i = s.indexOf(prefix);
     if (i >= 0) {
@@ -35,6 +66,65 @@ org.ellab.utils.extract = function(s, prefix, suffix) {
   }
   return s;
 };
+
+org.ellab.utils.each = function(object, callback, args) {
+  if (!object) {
+    return object;
+  }
+
+  var i = 0;
+  var length = object.length;
+  if (typeof length === 'undefined') {
+    length = object.snapshotLength;
+  }
+
+  if (typeof length === 'undefined') {
+    return object;
+  }
+
+  if (args) {
+    for (; i < length;) {
+      if (callback.apply(object[i++], args) === false) {
+        break;
+      }
+    }
+  }
+  else {
+    for (; i < length;) {
+      if (callback.call(object[i], i, object[i++]) === false) {
+        break;
+      }
+    }
+  }
+
+  return object;
+}
+
+// return the first element instead of an array if the selector is simply an id
+org.ellab.utils.sizzleSmart = function(selector, context, results, seed) {
+  if (selector.match(/^\s*#[a-zA-Z0-9\-_]+\s*$/)) {
+    return org.ellab.utils.sizzleOne(selector, context, results, seed);
+  }
+  else {
+    return Sizzle(selector, context, results, seed);
+  }
+}
+
+// wrap the result with each()
+org.ellab.utils.sizzleEach = function(selector, callback, args, context, results, seed) {
+  return org.ellab.utils.each(Sizzle(selector, context, results, seed), callback, args);
+}
+
+// return the first element instead of an array, useful if the caller only want the first element
+org.ellab.utils.sizzleOne = function(selector, context, results, seed) {
+  var res = Sizzle(selector, context, results, seed);
+  if (res && res.length > 0) {
+    return res[0];
+  }
+  else {
+    return null;
+  }
+}
 
 org.ellab.utils.crossOriginXMLHttpRequest_GM = function(params) {
   GM_xmlhttpRequest({
