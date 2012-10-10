@@ -17,13 +17,13 @@ registerNS("org.ellab.utils");
 org.ellab.utils.isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
 
 org.ellab.utils.extract = function(s, prefix, suffix) {
-  var i = s.indexOf(prefix);
-  if (i >= 0) {
-    s = s.substring(i + prefix.length);
-  }
-  else {
-    return '';
-  }
+    var i = s.indexOf(prefix);
+    if (i >= 0) {
+      s = s.substring(i + prefix.length);
+    }
+    else {
+      return '';
+    }
   if (suffix) {
     i = s.indexOf(suffix);
     if (i >= 0) {
@@ -178,19 +178,19 @@ org.ellab.utils.getElementsByClassName = function(className, node) {
 
 org.ellab.utils.decodeHTML = function(s) {
   if (!s) return s;
-  s = s.replace('&gt;', '>', 'g');
-  s = s.replace('&lt;', '<', 'g');
-  s = s.replace('&quot;', '"', 'g');
-  s = s.replace('&amp;', '&', 'g');
+    s = s.replace('&gt;', '>', 'g');
+    s = s.replace('&lt;', '<', 'g');
+    s = s.replace('&quot;', '"', 'g');
+    s = s.replace('&amp;', '&', 'g');
   return s;
 }
 
 org.ellab.utils.encodeHTML = function(s) {
   if (!s) return s;
-  s = s.replace('&', '&amp;', 'g');
-  s = s.replace('>', '&gt;', 'g');
-  s = s.replace('<', '&lt;', 'g');
-  s = s.replace('"', '&quot;', 'g');
+    s = s.replace('&', '&amp;', 'g');
+    s = s.replace('>', '&gt;', 'g');
+    s = s.replace('<', '&lt;', 'g');
+    s = s.replace('"', '&quot;', 'g');
   return s;
 }
 
@@ -201,6 +201,96 @@ org.ellab.utils.jsonParse = function(s) {
   else {
     return eval(s);
   }
+}
+
+// iterate the parent nodes until match the tag name
+org.ellab.utils.parent = function(node, tag) {
+  if (!node) return node;
+
+  var parentNode = node.parentNode;
+
+  if (!parentNode || !parentNode.tagName || parentNode.tagName.toUpperCase() == tag.toUpperCase()) return parentNode;
+
+  return this.parent(parentNode, tag);
+}
+
+// inject an javascript to the main window, useful for call the function in window
+org.ellab.utils.inject = function(fn) {
+  var script = document.createElement('script');
+  script.setAttribute("type", "application/javascript");
+  script.textContent = '(function(){' + fn + '})();';
+  document.body.appendChild(script); // run the script
+  document.body.removeChild(script); // clean up
+}
+
+org.ellab.utils.changeFavicon = function(img, type, id) {
+  id = id || 'ellab-favicon';
+  type = type || 'image/png';
+  var ss = document.getElementById(id);
+  if (ss) {
+    ss.href = img;
+  }
+  else {
+    var head = document.getElementsByTagName('head')[0];
+
+    // Create this favicon
+    var ss = document.createElement('link');
+    ss.setAttribute('id', id);
+    ss.rel = 'shortcut icon';
+    ss.type = type;
+    ss.href = img;
+    // Remove any existing favicons
+    var links = head.getElementsByTagName('link');
+    for (var i=0; i<links.length; i++) {
+      if (links[i].href == ss.href) return;
+      if (links[i].rel == "shortcut icon" || links[i].rel=="icon")
+        head.removeChild(links[i]);
+    }
+    // Add this favicon to the head
+    head.appendChild(ss);
+    // Force browser to acknowledge
+    var shim = document.createElement('iframe');
+    shim.width = shim.height = 0;
+    document.body.appendChild(shim);
+    shim.src = "icon";
+    document.body.removeChild(shim);
+  }
+}
+
+org.ellab.utils.hasClass = function(ele, clazz) {
+  var c = ele.className;
+  c = org.ellab.utils.trim(c);
+  return c.match(new RegExp('^' + clazz + '$')) != null ||
+         c.match(new RegExp('^' + clazz + '\\s+')) != null ||
+         c.match(new RegExp('\\s+' + clazz + '$')) != null ||
+         c.match(new RegExp('\\s+' + clazz + '\\s+')) != null;
+}
+
+org.ellab.utils.removeClass = function(ele, clazz) {
+  var c = ele.className, trimmed;
+  c = trimmed = org.ellab.utils.trim(c);
+  c = c.replace(new RegExp('^' + clazz + '$'), '');
+  c = c.replace(new RegExp('^' + clazz + '\\s+'), '');
+  c = c.replace(new RegExp('\\s+' + clazz + '$'), '');
+  c = c.replace(new RegExp('\\s+' + clazz + '\\s+'), ' ');
+  if (c) {
+    if (c != trimmed) {
+      // actually something removed
+      ele.className = c;
+    }
+  }
+  else {
+    ele.removeAttribute('class');
+  }
+}
+
+org.ellab.utils.addClass = function(ele, clazz) {
+  org.ellab.utils.removeClass(ele, clazz)
+  ele.className += (ele.className?' ':'') + clazz;
+}
+
+org.ellab.utils.insertAfter = function(newnode, oldnode) {
+  oldnode.parentNode.insertBefore(newnode, oldnode.nextSibling);;
 }
 
 })();
