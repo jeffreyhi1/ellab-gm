@@ -296,13 +296,18 @@ org.ellab.utils.encodeHTML = function(s) {
   return s;
 }
 
-org.ellab.utils.jsonParse = function(s) {
-  if (typeof(JSON) != 'undefined' && JSON.parse) {
+// wrapper for parsing json, fallback to eval if not supported
+org.ellab.utils.parseJSON = function(s) {
+  if (typeof JSON  != 'undefined' && typeof JSON.parse != 'undefined') {
     return JSON.parse(s);
   }
   else {
     return eval(s);
   }
+}
+
+org.ellab.utils.parseXML = function(s) {
+  return (new window.DOMParser()).parseFromString(s, "text/xml");
 }
 
 // iterate the parent nodes until match the tag name
