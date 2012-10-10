@@ -240,6 +240,18 @@ org.ellab.utils.calcOffsetLeft = function(node) {
   return left;
 }
 
+org.ellab.utils.detectScroll = function(callback) {
+  window.addEventListener('scroll', function() {
+    var st = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+    if (!st) {
+      callback.call(window, 'top');
+    }
+    else if ((st + document.documentElement.clientHeight) >= document.documentElement.scrollHeight) {
+      callback.call(window, 'bottom');
+    }
+  }, false);
+}
+
 org.ellab.utils.xpath = function(xpath, ele) {
   return document.evaluate(xpath, ele?ele:document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
