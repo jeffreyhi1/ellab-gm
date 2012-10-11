@@ -27,7 +27,7 @@ org.ellab.utils._testHasClass = function() {
   testHelper('barfoo', false);
   testHelper('foo-bar', false);
   console.log('_testHasClass finished');
-}
+};
 org.ellab.utils._testHasClass();
 
 org.ellab.utils._testRemoveClass = function() {
@@ -58,7 +58,7 @@ org.ellab.utils._testRemoveClass = function() {
   testHelper('barfoo', 'foo', 'barfoo');
   testHelper('foo-bar', 'foo', 'foo-bar');
   console.log('_testRemoveClass finished');
-}
+};
 org.ellab.utils._testRemoveClass();
 
 })();
