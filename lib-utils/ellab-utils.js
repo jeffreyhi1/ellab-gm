@@ -203,7 +203,7 @@ org.ellab.utils.getSession = function(name) {
   else {
     return this.getCookie(name);
   }
-}
+};
 
 org.ellab.utils.setSession = function(name, value) {
   if (window.sessionStorage && window.sessionStorage.setItem) {
@@ -212,7 +212,7 @@ org.ellab.utils.setSession = function(name, value) {
   else {
     return this.setCookie(name, value);
   }
-}
+};
 
 org.ellab.utils.getResourceURL = function(name, file) {
   if (typeof GM_getResourceURL != 'undefined') {
@@ -224,7 +224,7 @@ org.ellab.utils.getResourceURL = function(name, file) {
   else {
     return file;
   }
-}
+};
 
 org.ellab.utils.calcOffsetTop = function(node) {
   var top = 0;
@@ -233,7 +233,7 @@ org.ellab.utils.calcOffsetTop = function(node) {
   } while (node = node.offsetParent);
 
   return top;
-}
+};
 
 org.ellab.utils.calcOffsetLeft = function(node) {
   var left = 0;
@@ -242,7 +242,7 @@ org.ellab.utils.calcOffsetLeft = function(node) {
   } while (node = node.offsetParent);
 
   return left;
-}
+};
 
 org.ellab.utils.detectScroll = function(callback) {
   window.addEventListener('scroll', function() {
@@ -258,11 +258,11 @@ org.ellab.utils.detectScroll = function(callback) {
 
 org.ellab.utils.xpath = function(xpath, ele) {
   return document.evaluate(xpath, ele?ele:document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-}
+};
 
 org.ellab.utils.xpathl = function(xpath, ele) {
   return document.evaluate(xpath, ele?ele:document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-}
+};
 
 org.ellab.utils.getElementsByClassName = function(className, node) {
   if (!className) {
@@ -280,7 +280,7 @@ org.ellab.utils.getElementsByClassName = function(className, node) {
     }
     return result;
   }
-}
+};
 
 org.ellab.utils.decodeHTML = function(s) {
   if (s) {
@@ -290,7 +290,7 @@ org.ellab.utils.decodeHTML = function(s) {
     s = s.replace('&amp;', '&', 'g');
   }
   return s;
-}
+};
 
 org.ellab.utils.encodeHTML = function(s) {
   if (s) {
@@ -300,7 +300,7 @@ org.ellab.utils.encodeHTML = function(s) {
     s = s.replace('"', '&quot;', 'g');
   }
   return s;
-}
+};
 
 // wrapper for parsing json, fallback to eval if not supported
 org.ellab.utils.parseJSON = function(s) {
@@ -310,7 +310,7 @@ org.ellab.utils.parseJSON = function(s) {
   else {
     return eval(s);
   }
-}
+};
 
 org.ellab.utils.parseXML = function(s) {
   return (new window.DOMParser()).parseFromString(s, "text/xml");
