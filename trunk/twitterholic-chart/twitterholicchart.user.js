@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name           Twitterholic Chart
-// @version        1
+// @name           Twitaholic Chart
+// @version        2
 // @namespace      http://ellab.org/
-// @description    Show a more detail chart in twitterholic.com user stat page
-// @include        http://twitterholic.com/*
+// @description    Show a more detail chart in twitaholic.com user stat page
+// @include        http://Twitaholic.com/*
 // ==/UserScript==
 
 /*
@@ -39,7 +39,7 @@ var X_AXIS_LABEL_COUNT = 11;
 var Y_AXIS_LABEL_COUNT = 6;
 
 // normalize the y axis scale so the label will distribute evenly
-// return true if the friend and follower axis share same scale
+// return true if the following and follower axis share same scale
 function normalize_yaxis(data) {
   function log_base10(n) {
     return Math.log(n) / Math.log(10);
@@ -47,7 +47,7 @@ function normalize_yaxis(data) {
 
   var share_axis = false;
 
-  // friend and follower axis share same scale if their number if close enough
+  // following and follower axis share same scale if their number if close enough
   if (Math.max(data[0].max, data[1].max) / Math.min(data[0].max, data[1].max) <= 1.75) {
     data[0].max = data[1].max = Math.max(data[0].max, data[1].max);
     data[0].min = data[1].min = Math.min(data[0].min, data[1].min);
@@ -76,15 +76,15 @@ function encode_gchart_data_extended(n, m) {
 }
 
 var charturl = 'http://chart.apis.google.com/chart?cht=lxy' +
-               '&chdl=Followers|Friends|Tweets' +
-               '&chco=3072F3,ff0000,00aaaa&chs=' + CHART_WIDTH + 'x' + CHART_HEIGHT + '&chma=30,30,10,10|90,20&chd=e:';
+               '&chdl=Followers|Following|Tweets' +
+               '&chco=4671d5,6c8cd5,ffaa00&chs=' + CHART_WIDTH + 'x' + CHART_HEIGHT + '&chma=30,30,10,10|90,20&chd=e:';
 var dateurl = '';
 
 var table = document.getElementById('stat_history');
 if (table) {
   var data = [];
   var first_day = 0;
-  // 0-follower, 1-friend, 2-tweet
+  // 0-follower, 1-following, 2-tweet
   var DATA_COUNT = 3;
   var control_data = [{url:'', url_chxl:'', min:999999999, max:0},
                       {url:'', url_chxl:'', min:999999999, max:0},
@@ -157,18 +157,6 @@ if (table) {
                   '|2:' + control_data[0].url_chxl +
                   '|3:' + control_data[1].url_chxl +
                   '|4:' + control_data[2].url_chxl;
-    }
-
-    // remove the preceeding <br> tag
-    var sibling = table.previousSibling;
-    while (sibling) {
-      if (sibling.tagName.toUpperCase() == 'BR') {
-        sibling.parentNode.removeChild(sibling);
-        break;
-      }
-      else {
-        sibling = sibling.previousSibling;
-      }
     }
 
     // finally, add the chart to the dom
