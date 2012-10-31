@@ -16,6 +16,7 @@ Version history:
 */
 
 (function(){
+'use strict';
 
 var MONTH_NAME = [];
 MONTH_NAME['January'] = 0;
@@ -56,7 +57,7 @@ function normalize_yaxis(data) {
   }
 
   for (var i=0;i<data.length;i++) {
-    var factor = Math.max(10, Math.pow(10, parseInt(log_base10(data[i].max), 10) - 1))
+    var factor = Math.max(10, Math.pow(10, parseInt(log_base10(data[i].max), 10) - 1));
     factor = factor * (Y_AXIS_LABEL_COUNT - 1);
     data[i].max = Math.ceil(data[i].max / factor) * factor;
     data[i].min = Math.floor(data[i].min / factor) * factor;
@@ -82,6 +83,7 @@ var dateurl = '';
 
 var table = document.getElementById('stat_history');
 if (table) {
+  var i, j;
   var data = [];
   var first_day = 0;
   // 0-follower, 1-following, 2-tweet
@@ -91,7 +93,7 @@ if (table) {
                       {url:'', url_chxl:'', min:999999999, max:0}];
 
   var tr = table.getElementsByTagName('tr');
-  for (var i=0;i<tr.length;i++) {
+  for (i=0;i<tr.length;i++) {
     // parse date
     var date_res = tr[i].cells[0].textContent.match(/([a-zA-Z]+)\s(\d+),\s(\d+)/);
     if (date_res && MONTH_NAME[date_res[1]]) {
@@ -101,7 +103,7 @@ if (table) {
       first_day = date.getTime() / 86400000;
 
       var data_item = [];
-      for (var j=0;j<DATA_COUNT;j++) {
+      for (j=0;j<DATA_COUNT;j++) {
         data_item[j] = parseInt(tr[i].cells[j+1].textContent.replace(/,/g, ''), 10);
         control_data[j].min = Math.min(control_data[j].min, data_item[j]);
         control_data[j].max = Math.max(control_data[j].max, data_item[j]);
@@ -113,9 +115,9 @@ if (table) {
   // construct url
   var share_axis = normalize_yaxis(control_data, true);
 
-  for (var i=data.length-1;i>=0;i--) {
-    dateurl += encode_gchart_data_extended(data[i].day - first_day, data[0].day - first_day);;
-    for (var j=0;j<DATA_COUNT;j++) {
+  for (i=data.length-1;i>=0;i--) {
+    dateurl += encode_gchart_data_extended(data[i].day - first_day, data[0].day - first_day);
+    for (j=0;j<DATA_COUNT;j++) {
       control_data[j].url += encode_gchart_data_extended(data[i].data_item[j] - control_data[j].min, control_data[j].max - control_data[j].min);
     }
   }
@@ -128,7 +130,7 @@ if (table) {
     var chxl_month = '';
     var chxl_year = '';
     var last_displayed_year = 0;
-    for (var i=0;i<X_AXIS_LABEL_COUNT;i++) {
+    for (i=0;i<X_AXIS_LABEL_COUNT;i++) {
       // calculate the date of each label point
       var x_time = (data[data.length-1].date.getTime() + i * Math.round((data[0].date.getTime() - data[data.length-1].date.getTime()) / (X_AXIS_LABEL_COUNT - 1)));
       var x_date = new Date();
@@ -141,8 +143,8 @@ if (table) {
         chxl_year += last_displayed_year;
       }
     }
-    for (var i=0;i<Y_AXIS_LABEL_COUNT;i++) {
-      for (var j=0;j<DATA_COUNT;j++) {
+    for (i=0 ; i<Y_AXIS_LABEL_COUNT ; i++) {
+      for (j=0 ; j<DATA_COUNT ; j++) {
         control_data[j].url_chxl += '|' + (control_data[j].min + i * Math.round((control_data[j].max - control_data[j].min) / (Y_AXIS_LABEL_COUNT - 1)));
       }
     }
