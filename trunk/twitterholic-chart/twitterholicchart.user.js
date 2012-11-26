@@ -160,6 +160,9 @@ if (table) {
                   '|3:' + control_data[1].url_chxl +
                   '|4:' + control_data[2].url_chxl;
     }
+    
+    // add marker
+    charturl += '&chm=o,999999,0,-1,4|o,999999,1,-1,4|o,999999,2,-1,4';
 
     // finally, add the chart to the dom
     var img = document.createElement('img');
