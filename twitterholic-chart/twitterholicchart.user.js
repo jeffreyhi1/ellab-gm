@@ -76,6 +76,30 @@ function encode_gchart_data_extended(n, m) {
   return r;
 }
 
+// normalize the yaxis to K, M, B
+function kmb_yaxis(n, min) {
+  function kmb_yaxis_m(n) {
+    n = (Math.round(n / 100000) / 10);
+    if (min < 10000000 && n == parseInt(n, 10)) {
+      n = n + '.0';
+    }
+    return n + 'M';
+  }
+  function kmb_yaxis_k(n) {
+    return (Math.round(n / 100) / 10) + 'K';
+  }
+
+  if (min >= 1000000) {
+    return kmb_yaxis_m(n);
+  }
+  else if (min >= 5000) {
+    return kmb_yaxis_k(n);
+  }
+  else {
+    return n;
+  }
+}
+
 var charturl = 'http://chart.apis.google.com/chart?cht=lxy' +
                '&chdl=Followers|Following|Tweets' +
                '&chco=4671d5,6c8cd5,ffaa00&chs=' + CHART_WIDTH + 'x' + CHART_HEIGHT + '&chma=30,30,10,10|90,20&chd=e:';
@@ -145,7 +169,9 @@ if (table) {
     }
     for (i=0 ; i<Y_AXIS_LABEL_COUNT ; i++) {
       for (j=0 ; j<DATA_COUNT ; j++) {
-        control_data[j].url_chxl += '|' + (control_data[j].min + i * Math.round((control_data[j].max - control_data[j].min) / (Y_AXIS_LABEL_COUNT - 1)));
+        var y = (control_data[j].min + i * Math.round((control_data[j].max - control_data[j].min) / (Y_AXIS_LABEL_COUNT - 1)));
+        y = kmb_yaxis(y, control_data[j].min);
+        control_data[j].url_chxl += '|' + y;
       }
     }
 
@@ -160,7 +186,7 @@ if (table) {
                   '|3:' + control_data[1].url_chxl +
                   '|4:' + control_data[2].url_chxl;
     }
-    
+
     // add marker
     charturl += '&chm=o,999999,0,-1,4|o,999999,1,-1,4|o,999999,2,-1,4';
 
