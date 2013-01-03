@@ -61,10 +61,10 @@ function init() {
   if (document.body) waitForReady();
 }
 
-
 // Wait for the dom ready
 function waitForReady() {
-  if (unreadCountElement = document.getElementById('reading-list-unread-count')) {
+  unreadCountElement = document.getElementById('reading-list-unread-count');
+  if (unreadCountElement) {
     if (hasDOMSubtreeModified) {
       var res = document.evaluate("//span[contains(@class, 'unread-count') and contains(@class, 'sub-unread-count') and not(contains(@class, 'folder-unread-count'))]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
       for (var i=0;i<res.snapshotLength;i++) {
@@ -163,14 +163,14 @@ function calcUnread() {
   }
 
   // untagged items
-  var res2 = document.evaluate("//ul[@id='sub-tree']/li/ul/li[not(contains(@class, 'folder')) and contains(@class, 'unread')]/a/div[contains(@class, 'unread-count')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-  for (var j=0;j<res2.snapshotLength;j++) {
-    var result = findItemUnread(checkDuplicated, res2.snapshotItem(j));
-    if (result.hasplus) {
+  var resUntagged = document.evaluate("//ul[@id='sub-tree']/li/ul/li[not(contains(@class, 'folder')) and contains(@class, 'unread')]/a/div[contains(@class, 'unread-count')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (var k=0;k<resUntagged.snapshotLength;k++) {
+    var resultUntagged = findItemUnread(checkDuplicated, resUntagged.snapshotItem(k));
+    if (resultUntagged.hasplus) {
       totalplus = true;
     }
-    if (!result.alreadyCounted) {
-      total += result.count;
+    if (!resultUntagged.alreadyCounted) {
+      total += resultUntagged.count;
     }
   }
 
@@ -180,7 +180,7 @@ function calcUnread() {
 
     // update windows title as well
     if (totaltext) {
-      var newTitle = '(' + totaltext + ') ' + document.title.replace(/\s*\(\d+\+?\)$/, '').replace(/^\(\d+\+?\)\s*/, '');;
+      var newTitle = '(' + totaltext + ') ' + document.title.replace(/\s*\(\d+\+?\)$/, '').replace(/^\(\d+\+?\)\s*/, '');
       if (document.title != newTitle) {
         document.title = newTitle;
       }
