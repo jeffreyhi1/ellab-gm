@@ -38,10 +38,15 @@ Version history:
 var isChrome = false;
 var isSafari = false;
 
+var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
 // features switch
 var hasDOMSubtreeModified = false;
 
 var unreadCountElement = null;
+var starredItemCountElement = null;
+
+var starredItemObserver = new MutationObserver(function(mutations, observer) { countStarredItem(); });
 
 function init() {
   if (navigator.userAgent.match(/Chrome/)) {
@@ -55,6 +60,7 @@ function init() {
 
   if (document.body) waitForReady();
 }
+
 
 // Wait for the dom ready
 function waitForReady() {
@@ -70,6 +76,28 @@ function waitForReady() {
       window.setInterval(calcUnread, 3000);
     }
     calcUnread();
+
+    var starElement = document.evaluate("//div[@id='star-selector']//span[@class='text']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    if (starElement) {
+      starredItemCountElement = document.createElement("span");
+      starredItemCountElement.className = "unread-count";
+      starElement.appendChild(starredItemCountElement);
+
+      var starredHelp = document.createElement("a");
+      starredHelp.setAttribute("id", "ellab-starred-help");
+      starredHelp.className = "unread-count";
+      starredHelp.innerHTML = "[?]";
+      starredHelp.href = "#";
+      starredHelp.addEventListener("click", function(e) { e.preventDefault(); e.stopPropagation(); return false; }, false);
+      starredHelp.addEventListener("mouseover", function(e) { e.target.style.textDecoration = "underline"; }, false);
+      starredHelp.addEventListener("mouseout", function(e) { e.target.style.textDecoration = "none"; }, false);
+      starredHelp.setAttribute("style", "display:none; ");
+      starredHelp.setAttribute("title", "Only count the displayed starred items");
+      starElement.appendChild(starredHelp);
+
+      window.addEventListener("hashchange", onHashChange, false);
+      onHashChange();
+    }
   }
   else {
     window.setTimeout(waitForReady, 500);
@@ -156,6 +184,25 @@ function calcUnread() {
       if (document.title != newTitle) {
         document.title = newTitle;
       }
+    }
+  }
+}
+
+function countStarredItem() {
+  var res = document.evaluate("//div[@id='entries']/div[contains(@class, 'entry')]//div[contains(@class, 'item-star-active')]", document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  if (res.snapshotLength > 0) {
+    starredItemCountElement.innerHTML = ' (' + res.snapshotLength + ')';
+    document.getElementById("ellab-starred-help").style.display = "inline";
+  }
+}
+
+function onHashChange() {
+  if (starredItemCountElement) {
+    if (document.location.hash.indexOf("%2Fstate%2Fcom.google%2Fstarred") > 0 || document.location.hash.indexOf("/state/com.google/starred") > 0) {
+      starredItemObserver.observe(document.getElementById("entries"), { childList: true, subtree: true, attributes: true });
+    }
+    else {
+      starredItemObserver.disconnect();
     }
   }
 }
