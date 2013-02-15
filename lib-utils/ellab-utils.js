@@ -319,16 +319,27 @@ org.ellab.utils.parseXML = function(s) {
   return (new window.DOMParser()).parseFromString(s, "text/xml");
 };
 
-// iterate the parent nodes until match the tag name
-org.ellab.utils.parent = function(node, tag) {
+// iterate the parent nodes until match the tag name and/or className
+org.ellab.utils.parent = function(node, tag, className) {
   if (!node) return node;
 
-  var parentNode = node.parentNode;
+  if (!tag && !className) return node.parentNode;
 
-  if (!parentNode || !parentNode.tagName || parentNode.tagName.toUpperCase() == tag.toUpperCase()) return parentNode;
+  node = node.parentNode;
+  while (node) {
+    var matchTag = !tag || (node.tagName && node.tagName.toUpperCase() === tag.toUpperCase());
+    var matchClass = !className || this.hasClass(node, className);
 
-  return this.parent(parentNode, tag);
+    if (matchTag && matchClass) {
+      return node;
+    }
+
+    node = node.parentNode;
+  }
+
+  return node;
 };
+
 
 // inject an javascript to the main window, useful for call the function in window
 org.ellab.utils.inject = function(fn) {
