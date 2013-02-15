@@ -61,4 +61,52 @@ org.ellab.utils._testRemoveClass = function() {
 };
 org.ellab.utils._testRemoveClass();
 
+org.ellab.utils._testParent = function() {
+  var div = document.createElement('div');
+
+  /*jshint multistr:true */
+  div.innerHTML = '<div class="foo bar" id="div1"> \
+                     text1 \
+                     <span class="foo bar" id="span1">text2</span> \
+                     <span class="foo" id="span2"> \
+                       <span class="foo" id="span3"> \
+                         text4 \
+                         <div id="div2"> \
+                           <div id="test"></div> \
+                         </div> \
+                       </span> \
+                     </span> \
+                   </div>';
+  /*jshint multistr:false */
+  document.body.appendChild(div);
+
+  function testHelper(tag, className, expected) {
+    var ele = document.getElementById('test');
+    var res = org.ellab.utils.parent(ele, tag, className);
+    var fail = false;
+    var actual = res?res.getAttribute('id'):null;
+
+    fail = expected?(expected !== actual):(actual !== null);
+
+    if (fail) {
+      console.log('_testParent fail tag=' + tag + ', className=' + className + ', expected=' + expected + ', actual=' + actual);
+    }
+  }
+
+  testHelper(null, null, 'div2');
+  testHelper('div', 'foo', 'div1');
+  testHelper('DIV', 'foo', 'div1');
+  testHelper('div', null, 'div2');
+  testHelper('span', 'foo', 'span3');
+  testHelper(null, 'foo', 'span3');
+  testHelper(null, 'bar', 'div1');
+  testHelper(null, 'tao', null);
+  testHelper('h1', null, null);
+
+  document.body.removeChild(div);
+  div = null;
+  console.log('_testParent finished');
+};
+org.ellab.utils._testParent();
+
 })();
